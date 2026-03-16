@@ -330,7 +330,7 @@ body.light .theme-toggle-btn{background:var(--surface2);}
 </head>
 <body>
 <div class="app" id="app" style="display:none">
-  <div class="user-bar"><span id="role-badge" style="color:var(--gold)">🎸</span><span id="user-email-lbl"></span><button class="logout-btn" onclick="logout()">Salir</button></div>
+  <div class="user-bar"><span id="role-badge" style="color:var(--gold);font-size:9px;font-family:monospace;font-weight:700;">🎸 Músico</span><button class="logout-btn" onclick="logout()" style="margin-left:auto;">Salir</button></div>
 <aside class="sidebar">
   <div class="sidebar-header">
     <div class="logo">Ministerio<br>de Adoración<span>Song Manager</span></div>
@@ -361,7 +361,7 @@ body.light .theme-toggle-btn{background:var(--surface2);}
         <div class="cat-counter cat-otro"><div class="cat-counter-num" id="cnt-otro">0</div><div class="cat-counter-label">Otro</div></div>
       </div>
     </div>
-    <div class="sort-bar"><span class="sort-lbl">Orden:</span><button class="sort-btn active" onclick="setSort('az',this)">A-Z</button><button class="sort-btn" onclick="setSort('tono',this)">Tono</button><button class="sort-btn" onclick="setSort('artista',this)">Artista</button><button class="sort-btn" onclick="setSort('fav',this)">★</button></div>
+    <div class="sort-bar"><button class="sort-btn active" onclick="setSort('az',this)">A-Z</button><button class="sort-btn" onclick="setSort('tono',this)">Tono</button><button class="sort-btn" onclick="setSort('artista',this)">Artista</button><button class="sort-btn" onclick="setSort('fav',this)">★</button></div>
 <input class="search-input" type="text" placeholder="Buscar canción..." oninput="filterSongs(this.value)">
     <div class="cat-filters">
       <button class="cat-filter-btn active-todos" id="cf-todos" onclick="setCatFilter('todos')">Todos</button>
@@ -2115,7 +2115,7 @@ function onLoggedIn(){
   var isL=_role==='lider';
   document.getElementById('app').className='app'+(isL?' is-lider':'');
   var rb=document.getElementById('role-badge');
-  if(rb){rb.textContent=isL?'👑 Líder':'🎸 Músico';rb.style.color=isL?'var(--gold)':'var(--text-dim)';}
+  if(rb){rb.textContent=isL?'👑 Líder':'🎸 Músico';rb.style.color=isL?'var(--gold)':'var(--text-dim)';rb.style.fontSize='9px';rb.style.fontFamily='monospace';rb.style.fontWeight='700';}
   var em=document.getElementById('user-email-lbl');
   if(em&&_me) em.textContent=_me.email;
   var eb=document.getElementById('edit-btn');
