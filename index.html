@@ -826,10 +826,16 @@ function startClock() {
 
 function renderSongList() {
   const container = document.getElementById('song-list');
-  const filtered = songs.filter(s => {
+  let filtered = songs.filter(s => {
     const txt = s.title.toLowerCase().includes(searchFilter) || (s.author||'').toLowerCase().includes(searchFilter);
     const cat = catFilter === 'todos' || (s.categoria||'otro') === catFilter;
     return txt && cat;
+  });
+  filtered = filtered.slice().sort(function(a,b){
+    if(sortMode==='tono') return (a.key||'').localeCompare(b.key||'');
+    if(sortMode==='artista') return (a.author||'').toLowerCase().localeCompare((b.author||'').toLowerCase());
+    if(sortMode==='fav') return (b.fav?1:0)-(a.fav?1:0);
+    return a.title.toLowerCase().localeCompare(b.title.toLowerCase());
   });
   if (!filtered.length) { container.innerHTML = `<div class="set-empty">No hay canciones que coincidan</div>`; return; }
   container.innerHTML = filtered.map(s => {
