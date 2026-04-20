@@ -538,7 +538,7 @@ body.light .theme-toggle-btn{background:var(--surface2);}
 [Coro]
 [C]Cantaré [G]siempre
 [Am]De tu [F]gran amor"></textarea>
-      <div class="form-hint">Formato: [SECCIÓN] · [SECCIÓN:color] para colorear (rojo, azul, verde, amarillo, morado, naranja, dorado, cyan) · [ACORDE] antes de sílaba · Acordes encima de letra · >> al inicio para marcar acordes (ej: >>C D Em G)</div>
+      <div class="form-hint">Formato: [SECCIÓN] para etiquetas · [ACORDE] antes de la sílaba · También acepta acordes encima de la letra (estilo lacuerda.net)</div>
     </div>
     <div class="modal-actions">
       <button class="btn btn-ghost" onclick="closeModalDirect()">Cancelar</button>
@@ -613,7 +613,13 @@ body.light .theme-toggle-btn{background:var(--surface2);}
       <div class="modal-actions">
         <button class="btn btn-ghost" style="width:auto;" onclick="backToImportStep1()">← Volver</button>
         <button class="btn btn-ghost" style="width:auto;" onclick="closeImportModal()">Cancelar</button>
-        <button class="btn btn-primary" style="width:auto;padding:8px 20px;" onclic
+        <button class="btn btn-primary" style="width:auto;padding:8px 20px;" onclick="saveImported()">✓ Guardar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
 // ═══════════════════════════════════════════════════════
 // MUSIC THEORY
 // ═══════════════════════════════════════════════════════
@@ -918,8 +924,7 @@ function renderEditor() {
   }
 
   parsed.forEach(section => {
-    const _sc = section.color ? " sc-"+section.color : "";
-    html += `<div class="song-section${_sc}"><div class="section-label${_sc}">${escHtml(section.label)}</div>`;
+    html += `<div class="song-section"><div class="section-label">${escHtml(section.label)}</div>`;
     section.lines.forEach(line => {
       if (!line.chordRow && (!line.lyric || line.lyric === '') && !line.chordsOnly) return;
       html += `<div class="lyric-line">`;
@@ -958,9 +963,7 @@ function parseSong(content, offset, baseKey) {
     const secMatch = trimmed.match(/^\[([^\]]+)\]$/);
     if (secMatch && !isChordToken(secMatch[1])) {
       if (cur) sections.push(cur);
-      const _sr = secMatch[1];
-      const _cm = _sr.match(/^(.+):([a-z]+)$/);
-      cur = { label: _cm ? _cm[1].trim() : _sr, color: _cm ? _cm[2].trim() : null, lines: [] };
+      cur = { label: secMatch[1], lines: [] };
       i++; continue;
     }
     if (!cur) cur = { label: 'Canción', lines: [] };
@@ -980,11 +983,7 @@ function parseSong(content, offset, baseKey) {
 
 function isChordOnlyLine(line) {
   if (!line || line.trim() === '') return false;
-  const t = line.trim();
-  if (t.startsWith('>>')) return true;
-  const cleaned = t.replace(/[\/\\\-\|\s_~.]+/g, ' ').trim();
-  if (!cleaned) return false;
-  return cleaned.split(/\s+/).every(tk => isChordToken(tk));
+  return line.trim().split(/\s+/).every(t => isChordToken(t));
 }
 
 function isChordToken(str) {
@@ -1007,10 +1006,6 @@ function parseInlineLine(raw, offset) {
 }
 
 function parseStackedLines(chordLine, lyricLine, offset) {
-  let cl = chordLine.trim();
-  if (cl.startsWith('>>')) cl = cl.slice(2).trim();
-  cl = cl.replace(/[\/\\\-\|_~.]+/g, ' ').trim();
-  chordLine = cl;
   const segs = [];
   const re = /\S+/g; let m;
   let width = 0;
@@ -1656,7 +1651,6 @@ const PDF_SCRIPT = `
   @media print{#pdf-toolbar{display:none!important;}body{padding-top:0!important;}}
 </style>
 <div id="pdf-toolbar">
-  <button class="tb-btn" onclick="window.close()" style="background:#c9a84c;border-color:#c9a84c;color:#111;font-weight:700;margin-right:8px;">← Volver</button>
   <span class="tb-label">Ajuste</span>
   <button class="tb-btn" onclick="autoFitAll()">&#8635; Auto-ajustar</button>
   <div class="tb-sep"></div>
@@ -2200,12 +2194,6 @@ function saveData(){
   }
 }
 function isLider(){return _role==='lider';}
-
-// ─── START ───
-loadTheme();
-init();
-setTimeout(updateNashvilleUI, 100);
-=='lider';}
 
 // ─── START ───
 loadTheme();
