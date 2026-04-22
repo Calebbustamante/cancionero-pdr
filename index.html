@@ -1657,14 +1657,14 @@ const PDF_STYLES = `
     body { padding-top:0 !important; }
   }
 
-  .sc-rojo .section-label{color:#e05555!important;border-bottom-color:#e05555!important;}
-  .sc-verde .section-label{color:#4a9e5a!important;border-bottom-color:#4a9e5a!important;}
-  .sc-azul .section-label{color:#4a7cce!important;border-bottom-color:#4a7cce!important;}
-  .sc-amarillo .section-label{color:#d4a017!important;border-bottom-color:#d4a017!important;}
-  .sc-morado .section-label{color:#9b59b6!important;border-bottom-color:#9b59b6!important;}
-  .sc-naranja .section-label{color:#e07820!important;border-bottom-color:#e07820!important;}
-  .sc-dorado .section-label{color:#c9a84c!important;border-bottom-color:#c9a84c!important;}
-  .sc-cyan .section-label{color:#4a8e9e!important;border-bottom-color:#4a8e9e!important;}
+  .sc-rojo .section-label-pdf{color:#e05555!important;border-bottom-color:#e05555!important;}
+  .sc-verde .section-label-pdf{color:#4a9e5a!important;border-bottom-color:#4a9e5a!important;}
+  .sc-azul .section-label-pdf{color:#4a7cce!important;border-bottom-color:#4a7cce!important;}
+  .sc-amarillo .section-label-pdf{color:#d4a017!important;border-bottom-color:#d4a017!important;}
+  .sc-morado .section-label-pdf{color:#9b59b6!important;border-bottom-color:#9b59b6!important;}
+  .sc-naranja .section-label-pdf{color:#e07820!important;border-bottom-color:#e07820!important;}
+  .sc-dorado .section-label-pdf{color:#c9a84c!important;border-bottom-color:#c9a84c!important;}
+  .sc-cyan .section-label-pdf{color:#4a8e9e!important;border-bottom-color:#4a8e9e!important;}
 `;
 
 const PDF_SCRIPT = `
@@ -1781,7 +1781,8 @@ function buildSongPageHTML(song, offset) {
   if (song.notes) body += `<div class="song-notes-pdf">📝 ${escHtml(song.notes)}</div>`;
   body += `<div class="sections-wrapper">`;
   parsed.forEach(section => {
-    body += `<div class="section-block"><div class="section-label-pdf">${escHtml(section.label)}</div><div class="section-content">${renderLines(section.lines)}</div></div>`;
+    const _sc = section.color ? " sc-"+section.color : "";
+    body += `<div class="section-block${_sc}"><div class="section-label-pdf${_sc}">${escHtml(section.label)}</div><div class="section-content">${renderLines(section.lines)}</div></div>`;
   });
   body += `</div></div>`;
   return body;
