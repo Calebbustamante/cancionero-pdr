@@ -324,14 +324,22 @@ body.light .theme-toggle-btn{background:var(--surface2);}
 .is-lider .lider-only{display:inline-flex !important;}
 .is-lider button.lider-only{display:inline-flex !important;}
 
-.section-label.sc-rojo{color:#e05555 !important;border-bottom-color:#e05555 !important;}
-.section-label.sc-verde{color:#4a9e5a !important;border-bottom-color:#4a9e5a !important;}
-.section-label.sc-azul{color:#4a7cce !important;border-bottom-color:#4a7cce !important;}
-.section-label.sc-amarillo{color:#d4a017 !important;border-bottom-color:#d4a017 !important;}
-.section-label.sc-morado{color:#9b59b6 !important;border-bottom-color:#9b59b6 !important;}
-.section-label.sc-naranja{color:#e07820 !important;border-bottom-color:#e07820 !important;}
-.section-label.sc-dorado{color:#c9a84c !important;border-bottom-color:#c9a84c !important;}
-.section-label.sc-cyan{color:#4a8e9e !important;border-bottom-color:#4a8e9e !important;}
+.section-label.sc-rojo{color:#e05555!important;border-bottom-color:#e05555!important;}
+.section-label.sc-verde{color:#4a9e5a!important;border-bottom-color:#4a9e5a!important;}
+.section-label.sc-azul{color:#4a7cce!important;border-bottom-color:#4a7cce!important;}
+.section-label.sc-amarillo{color:#d4a017!important;border-bottom-color:#d4a017!important;}
+.section-label.sc-morado{color:#9b59b6!important;border-bottom-color:#9b59b6!important;}
+.section-label.sc-naranja{color:#e07820!important;border-bottom-color:#e07820!important;}
+.section-label.sc-dorado{color:#c9a84c!important;border-bottom-color:#c9a84c!important;}
+.section-label.sc-cyan{color:#4a8e9e!important;border-bottom-color:#4a8e9e!important;}
+.section-label-pdf.sc-rojo{color:#e05555!important;border-bottom-color:#e05555!important;}
+.section-label-pdf.sc-verde{color:#4a9e5a!important;border-bottom-color:#4a9e5a!important;}
+.section-label-pdf.sc-azul{color:#4a7cce!important;border-bottom-color:#4a7cce!important;}
+.section-label-pdf.sc-amarillo{color:#d4a017!important;border-bottom-color:#d4a017!important;}
+.section-label-pdf.sc-morado{color:#9b59b6!important;border-bottom-color:#9b59b6!important;}
+.section-label-pdf.sc-naranja{color:#e07820!important;border-bottom-color:#e07820!important;}
+.section-label-pdf.sc-dorado{color:#c9a84c!important;border-bottom-color:#c9a84c!important;}
+.section-label-pdf.sc-cyan{color:#4a8e9e!important;border-bottom-color:#4a8e9e!important;}
 </style>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
@@ -537,6 +545,19 @@ body.light .theme-toggle-btn{background:var(--surface2);}
     </div>
     <div class="form-group">
       <label class="form-label">Letra con Acordes</label>
+      <div style="display:flex;gap:6px;align-items:center;padding:5px 0;flex-wrap:wrap;">
+      <span style="font-size:9px;color:var(--text-dim);font-family:monospace;letter-spacing:.08em;text-transform:uppercase;">Color:</span>
+      <button title="Quitar color" onclick="applyTxtColor('')" style="width:26px;height:26px;border-radius:50%;cursor:pointer;border:2px solid transparent;display:inline-block;flex-shrink:0;background:var(--surface2);border:2px dashed var(--text-dim);font-size:11px;color:var(--text-dim);">×</button>
+      <button title="Rojo" onclick="applyTxtColor('rojo')" style="width:26px;height:26px;border-radius:50%;cursor:pointer;border:2px solid transparent;display:inline-block;flex-shrink:0;background:#e05555;"></button>
+      <button title="Azul" onclick="applyTxtColor('azul')" style="width:26px;height:26px;border-radius:50%;cursor:pointer;border:2px solid transparent;display:inline-block;flex-shrink:0;background:#4a7cce;"></button>
+      <button title="Verde" onclick="applyTxtColor('verde')" style="width:26px;height:26px;border-radius:50%;cursor:pointer;border:2px solid transparent;display:inline-block;flex-shrink:0;background:#4a9e5a;"></button>
+      <button title="Amarillo" onclick="applyTxtColor('amarillo')" style="width:26px;height:26px;border-radius:50%;cursor:pointer;border:2px solid transparent;display:inline-block;flex-shrink:0;background:#d4a017;"></button>
+      <button title="Morado" onclick="applyTxtColor('morado')" style="width:26px;height:26px;border-radius:50%;cursor:pointer;border:2px solid transparent;display:inline-block;flex-shrink:0;background:#9b59b6;"></button>
+      <button title="Naranja" onclick="applyTxtColor('naranja')" style="width:26px;height:26px;border-radius:50%;cursor:pointer;border:2px solid transparent;display:inline-block;flex-shrink:0;background:#e07820;"></button>
+      <button title="Dorado" onclick="applyTxtColor('dorado')" style="width:26px;height:26px;border-radius:50%;cursor:pointer;border:2px solid transparent;display:inline-block;flex-shrink:0;background:#c9a84c;"></button>
+      <button title="Cyan" onclick="applyTxtColor('cyan')" style="width:26px;height:26px;border-radius:50%;cursor:pointer;border:2px solid transparent;display:inline-block;flex-shrink:0;background:#4a8e9e;"></button>
+      <button title="Negrita" onclick="applyBold()" style="width:26px;height:26px;border-radius:4px;cursor:pointer;border:2px solid var(--border);background:var(--surface2);color:var(--text);font-weight:700;font-size:13px;font-family:serif;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;">B</button>
+    </div>
       <textarea class="form-textarea" id="f-content" placeholder="[Intro]
 [C] [G] [Am] [F]
 
@@ -547,7 +568,7 @@ body.light .theme-toggle-btn{background:var(--surface2);}
 [Coro]
 [C]Cantaré [G]siempre
 [Am]De tu [F]gran amor"></textarea>
-      <div class="form-hint">Formato: [SECCIÓN] · [SECCIÓN:color] para colorear (rojo, azul, verde, amarillo, morado, naranja, dorado, cyan) · [ACORDE] antes de sílaba · Acordes encima de letra · >> al inicio para marcar acordes (ej: >>C D Em G)</div>
+    <div class="form-hint">Formato: [SECCIÓN] · [SECCIÓN:color] para colorear (rojo, azul, verde, amarillo, morado, naranja, dorado, cyan) · [ACORDE] antes de sílaba · Acordes encima de letra · >> al inicio para marcar acordes (ej: >>C D Em G)</div>
     </div>
     <div class="modal-actions">
       <button class="btn btn-ghost" onclick="closeModalDirect()">Cancelar</button>
@@ -949,7 +970,13 @@ function renderEditor() {
         }
         html += `</div>`;
       }
-      if (line.lyric) html += `<div class="lyric-text">${escHtml(line.lyric)}</div>`;
+      if (line.lyric) {
+        let _raw = line.lyric;
+        let _lh = _raw.replace(/\{c:([a-z]+)\}(.*?)\{\/c\}/g, function(m,col,txt){ return '<span class="tc-'+col+'">'+escHtml(txt)+'</span>'; });
+        if (_lh === _raw) _lh = escHtml(_raw);
+        _lh = _lh.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+        html += `<div class="lyric-text">${_lh}</div>`;
+      }
       else if (line.chordsOnly) html += `<div class="lyric-text" style="min-height:4px"></div>`;
       html += `</div>`;
     });
@@ -1657,14 +1684,7 @@ const PDF_STYLES = `
     body { padding-top:0 !important; }
   }
 
-  .sc-rojo .section-label-pdf{color:#e05555!important;border-bottom-color:#e05555!important;}
-  .sc-verde .section-label-pdf{color:#4a9e5a!important;border-bottom-color:#4a9e5a!important;}
-  .sc-azul .section-label-pdf{color:#4a7cce!important;border-bottom-color:#4a7cce!important;}
-  .sc-amarillo .section-label-pdf{color:#d4a017!important;border-bottom-color:#d4a017!important;}
-  .sc-morado .section-label-pdf{color:#9b59b6!important;border-bottom-color:#9b59b6!important;}
-  .sc-naranja .section-label-pdf{color:#e07820!important;border-bottom-color:#e07820!important;}
-  .sc-dorado .section-label-pdf{color:#c9a84c!important;border-bottom-color:#c9a84c!important;}
-  .sc-cyan .section-label-pdf{color:#4a8e9e!important;border-bottom-color:#4a8e9e!important;}
+  :root{--tc-rojo:#e05555;--tc-verde:#4a9e5a;--tc-azul:#4a7cce;--tc-amarillo:#d4a017;--tc-morado:#9b59b6;--tc-naranja:#e07820;--tc-dorado:#c9a84c;--tc-cyan:#4a8e9e;}
 `;
 
 const PDF_SCRIPT = `
@@ -1767,7 +1787,13 @@ function buildSongPageHTML(song, offset) {
         }
         out += `<div class="chord-line">${escHtml(chordStr)}</div>`;
       }
-      if (line.lyric) out += `<div class="lyric-line-pdf">${escHtml(line.lyric)}</div>`;
+      if (line.lyric) {
+        let _raw2 = line.lyric;
+        let _pl = _raw2.replace(/\{c:([a-z]+)\}(.*?)\{\/c\}/g, function(m,col,txt){ return '<span style="color:var(--tc-'+col+')">'+escHtml(txt)+'</span>'; });
+        if (_pl === _raw2) _pl = escHtml(_raw2);
+        _pl = _pl.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+        out += `<div class="lyric-line-pdf">${_pl}</div>`;
+      }
       else if (line.chordsOnly) out += `<div class="lyric-line-pdf">&nbsp;</div>`;
     }
     return out;
@@ -1781,8 +1807,8 @@ function buildSongPageHTML(song, offset) {
   if (song.notes) body += `<div class="song-notes-pdf">📝 ${escHtml(song.notes)}</div>`;
   body += `<div class="sections-wrapper">`;
   parsed.forEach(section => {
-    const _sc = section.color ? " sc-"+section.color : "";
-    body += `<div class="section-block${_sc}"><div class="section-label-pdf${_sc}">${escHtml(section.label)}</div><div class="section-content">${renderLines(section.lines)}</div></div>`;
+    const _scp=section.color?" sc-"+section.color:"";
+    body += `<div class="section-block${_scp}"><div class="section-label-pdf${_scp}">${escHtml(section.label)}</div><div class="section-content">${renderLines(section.lines)}</div></div>`;
   });
   body += `</div></div>`;
   return body;
@@ -2225,6 +2251,55 @@ function saveData(){
   }
 }
 function isLider(){return _role==='lider';}
+
+function applyBold() {
+  var ta = document.getElementById('f-content');
+  if (!ta) return;
+  var start = ta.selectionStart, end = ta.selectionEnd;
+  var val = ta.value;
+  var selected = val.substring(start, end);
+  if (selected.length > 0) {
+    // Si ya tiene **, quitarlo
+    if (selected.startsWith('**') && selected.endsWith('**')) {
+      var inner = selected.slice(2, -2);
+      ta.value = val.substring(0, start) + inner + val.substring(end);
+      ta.selectionStart = start;
+      ta.selectionEnd = start + inner.length;
+    } else {
+      ta.value = val.substring(0, start) + '**' + selected + '**' + val.substring(end);
+      ta.selectionStart = start;
+      ta.selectionEnd = start + selected.length + 4;
+    }
+  } else {
+    ta.value = val.substring(0, start) + '****' + val.substring(end);
+    ta.selectionStart = start + 2;
+    ta.selectionEnd = start + 2;
+  }
+  ta.focus();
+}
+function applyTxtColor(color) {
+  var ta = document.getElementById('f-content');
+  if (!ta) return;
+  var start = ta.selectionStart, end = ta.selectionEnd;
+  var val = ta.value;
+  var selected = val.substring(start, end);
+  selected = selected.replace(/\{c:[a-z]+\}/g, '').replace(/\{\/c\}/g, '');
+  var newText;
+  if (color && selected.length > 0) {
+    newText = val.substring(0, start) + '{c:' + color + '}' + selected + '{/c}' + val.substring(end);
+    ta.value = newText;
+    ta.selectionStart = start;
+    ta.selectionEnd = start + selected.length + color.length + 7;
+  } else if (color) {
+    newText = val.substring(0, start) + '{c:' + color + '}{/c}' + val.substring(end);
+    ta.value = newText;
+    ta.selectionStart = start + color.length + 4;
+    ta.selectionEnd = start + color.length + 4;
+  } else if (selected.length > 0) {
+    ta.value = val.substring(0, start) + selected + val.substring(end);
+  }
+  ta.focus();
+}
 
 // ─── START ───
 loadTheme();
