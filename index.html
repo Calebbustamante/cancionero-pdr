@@ -340,6 +340,15 @@ body.light .theme-toggle-btn{background:var(--surface2);}
 .section-label-pdf.sc-naranja{color:#e07820!important;border-bottom-color:#e07820!important;}
 .section-label-pdf.sc-dorado{color:#c9a84c!important;border-bottom-color:#c9a84c!important;}
 .section-label-pdf.sc-cyan{color:#4a8e9e!important;border-bottom-color:#4a8e9e!important;}
+
+.tc-rojo{color:#e05555!important;}
+.tc-verde{color:#4a9e5a!important;}
+.tc-azul{color:#4a7cce!important;}
+.tc-amarillo{color:#d4a017!important;}
+.tc-morado{color:#9b59b6!important;}
+.tc-naranja{color:#e07820!important;}
+.tc-dorado{color:#c9a84c!important;}
+.tc-cyan{color:#4a8e9e!important;}
 </style>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
@@ -972,8 +981,23 @@ function renderEditor() {
       }
       if (line.lyric) {
         let _raw = line.lyric;
-        let _lh = _raw.replace(/\{c:([a-z]+)\}(.*?)\{\/c\}/g, function(m,col,txt){ return '<span class="tc-'+col+'">'+escHtml(txt)+'</span>'; });
-        if (_lh === _raw) _lh = escHtml(_raw);
+        let _lh;
+        if (/\{c:[a-z]+\}/.test(_raw)) {
+          // Tiene color — procesar por partes
+          _lh = '';
+          let _rest = _raw;
+          let _cm;
+          const _re = /\{c:([a-z]+)\}(.*?)\{\/c\}/g;
+          let _last = 0;
+          while ((_cm = _re.exec(_raw)) !== null) {
+            _lh += escHtml(_raw.slice(_last, _cm.index));
+            _lh += '<span class="tc-' + _cm[1] + '">' + escHtml(_cm[2]) + '</span>';
+            _last = _cm.index + _cm[0].length;
+          }
+          _lh += escHtml(_raw.slice(_last));
+        } else {
+          _lh = escHtml(_raw);
+        }
         _lh = _lh.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
         html += `<div class="lyric-text">${_lh}</div>`;
       }
