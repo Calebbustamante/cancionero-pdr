@@ -1662,7 +1662,7 @@ const PDF_SCRIPT = `
   <div class="tb-sep"></div>
   <button class="tb-btn print-btn" onclick="window.print()">Imprimir / PDF</button>
 </div>
-<script>
+\u003cscript\u003e
 // Cada .song-page tiene height:297mm y padding 12+10mm vertical = 22mm
 // clientHeight de la page = area total disponible en px
 // Comparamos scrollHeight del wrapper con su clientHeight (flex:1 = espacio restante)
@@ -1762,7 +1762,7 @@ function buildSongPageHTML(song, offset) {
 function printSong() {
   if (!currentSongId) { alert('Selecciona una canción primero'); return; }
   const song = songs.find(s => s.id === currentSongId);
-  openPDFWindow(`<!DOCTYPE html><html><head><meta charset="UTF-8"><style>${PDF_STYLES}</style></head><body>${buildSongPageHTML(song, transposeOffset)}${PDF_SCRIPT}<script>
+  openPDFWindow(`<!DOCTYPE html><html><head><meta charset="UTF-8"><style>${PDF_STYLES}</style></head><body>${buildSongPageHTML(song, transposeOffset)}${PDF_SCRIPT}\u003cscript\u003e
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', function() {
     navigator.serviceWorker.register('./sw.js')
@@ -1770,7 +1770,7 @@ if ('serviceWorker' in navigator) {
       .catch(function(e) { console.log('SW error:', e); });
   });
 }
-</script>
+<\/script>
 </body></html>`, song.title);
 }
 
@@ -1791,7 +1791,7 @@ function exportSetPDF() {
     const song = songs.find(s=>s.id===entry.id); if(!song) return;
     html += buildSongPageHTML(song, entry.offset);
   });
-  html += PDF_SCRIPT + `<script>
+  html += PDF_SCRIPT + `\u003cscript\u003e
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', function() {
     navigator.serviceWorker.register('./sw.js')
@@ -1799,7 +1799,7 @@ if ('serviceWorker' in navigator) {
       .catch(function(e) { console.log('SW error:', e); });
   });
 }
-</script>
+<\/script>
 </body></html>`;
   openPDFWindow(html, setName);
 }
