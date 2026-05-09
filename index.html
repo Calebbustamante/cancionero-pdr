@@ -4,12 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <title>Cancionero PDR</title>
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="Cancionero PDR">
-<meta name="mobile-web-app-capable" content="yes">
-<link rel="manifest" href="data:application/manifest+json;base64,ewogICJuYW1lIjogIkNhbmNpb25lcm8gUERSIiwKICAic2hvcnRfbmFtZSI6ICJDYW5jaW9uZXJvIiwKICAiZGVzY3JpcHRpb24iOiAiTWluaXN0ZXJpbyBkZSBBZG9yYWNpw7NuIFBEUiIsCiAgInN0YXJ0X3VybCI6ICIvY2FuY2lvbmVyby1wZHIvIiwKICAic2NvcGUiOiAiL2NhbmNpb25lcm8tcGRyLyIsCiAgImRpc3BsYXkiOiAic3RhbmRhbG9uZSIsCiAgImJhY2tncm91bmRfY29sb3IiOiAiIzBkMGQwZiIsCiAgInRoZW1lX2NvbG9yIjogIiNjOWE4NGMiLAogICJvcmllbnRhdGlvbiI6ICJwb3J0cmFpdCIsCiAgImljb25zIjogWwogICAgewogICAgICAic3JjIjogImRhdGE6aW1hZ2Uvc3ZnK3htbCwlM0NzdmcgeG1sbnM9J2h0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnJyB2aWV3Qm94PScwIDAgNTEyIDUxMiclM0UlM0NyZWN0IHdpZHRoPSc1MTInIGhlaWdodD0nNTEyJyByeD0nODAnIGZpbGw9JyUyMzBkMGQwZicvJTNFJTNDdGV4dCB4PScyNTYnIHk9JzM0MCcgZm9udC1zaXplPSczMDAnIHRleHQtYW5jaG9yPSdtaWRkbGUnIGZpbGw9JyUyM2M5YTg0YyclM0UlRTIlOTklQUElM0MvdGV4dCUzRSUzQy9zdmclM0UiLAogICAgICAic2l6ZXMiOiAiNTEyeDUxMiIsCiAgICAgICJ0eXBlIjogImltYWdlL3N2Zyt4bWwiLAogICAgICAicHVycG9zZSI6ICJhbnkgbWFza2FibGUiCiAgICB9CiAgXQp9">
-<meta name="theme-color" content="#0d0d0f">
+
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600&family=IBM+Plex+Sans:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -323,37 +318,18 @@ body.light .theme-toggle-btn{background:var(--surface2);}
 .lider-only{display:none !important;}
 .is-lider .lider-only{display:inline-flex !important;}
 .is-lider button.lider-only{display:inline-flex !important;}
-
-.section-label.sc-rojo{color:#e05555!important;border-bottom-color:#e05555!important;}
-.section-label.sc-verde{color:#4a9e5a!important;border-bottom-color:#4a9e5a!important;}
-.section-label.sc-azul{color:#4a7cce!important;border-bottom-color:#4a7cce!important;}
-.section-label.sc-amarillo{color:#d4a017!important;border-bottom-color:#d4a017!important;}
-.section-label.sc-morado{color:#9b59b6!important;border-bottom-color:#9b59b6!important;}
-.section-label.sc-naranja{color:#e07820!important;border-bottom-color:#e07820!important;}
-.section-label.sc-dorado{color:#c9a84c!important;border-bottom-color:#c9a84c!important;}
-.section-label.sc-cyan{color:#4a8e9e!important;border-bottom-color:#4a8e9e!important;}
-.section-label-pdf.sc-rojo{color:#e05555!important;border-bottom-color:#e05555!important;}
-.section-label-pdf.sc-verde{color:#4a9e5a!important;border-bottom-color:#4a9e5a!important;}
-.section-label-pdf.sc-azul{color:#4a7cce!important;border-bottom-color:#4a7cce!important;}
-.section-label-pdf.sc-amarillo{color:#d4a017!important;border-bottom-color:#d4a017!important;}
-.section-label-pdf.sc-morado{color:#9b59b6!important;border-bottom-color:#9b59b6!important;}
-.section-label-pdf.sc-naranja{color:#e07820!important;border-bottom-color:#e07820!important;}
-.section-label-pdf.sc-dorado{color:#c9a84c!important;border-bottom-color:#c9a84c!important;}
-.section-label-pdf.sc-cyan{color:#4a8e9e!important;border-bottom-color:#4a8e9e!important;}
-
-.tc-rojo{color:#e05555!important;}
-.tc-verde{color:#4a9e5a!important;}
-.tc-azul{color:#4a7cce!important;}
-.tc-amarillo{color:#d4a017!important;}
-.tc-morado{color:#9b59b6!important;}
-.tc-naranja{color:#e07820!important;}
-.tc-dorado{color:#c9a84c!important;}
-.tc-cyan{color:#4a8e9e!important;}
 </style>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<link rel="manifest" href="./manifest.json">
+<link rel="apple-touch-icon" href="./icon.svg">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Cancionero PDR">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#c9a84c">
 </head>
 <body>
 <div class="app" id="app" style="display:none">
@@ -554,19 +530,6 @@ body.light .theme-toggle-btn{background:var(--surface2);}
     </div>
     <div class="form-group">
       <label class="form-label">Letra con Acordes</label>
-      <div style="display:flex;gap:6px;align-items:center;padding:5px 0;flex-wrap:wrap;">
-      <span style="font-size:9px;color:var(--text-dim);font-family:monospace;letter-spacing:.08em;text-transform:uppercase;">Color:</span>
-      <button title="Quitar color" onclick="applyTxtColor('')" style="width:26px;height:26px;border-radius:50%;cursor:pointer;border:2px solid transparent;display:inline-block;flex-shrink:0;background:var(--surface2);border:2px dashed var(--text-dim);font-size:11px;color:var(--text-dim);">×</button>
-      <button title="Rojo" onclick="applyTxtColor('rojo')" style="width:26px;height:26px;border-radius:50%;cursor:pointer;border:2px solid transparent;display:inline-block;flex-shrink:0;background:#e05555;"></button>
-      <button title="Azul" onclick="applyTxtColor('azul')" style="width:26px;height:26px;border-radius:50%;cursor:pointer;border:2px solid transparent;display:inline-block;flex-shrink:0;background:#4a7cce;"></button>
-      <button title="Verde" onclick="applyTxtColor('verde')" style="width:26px;height:26px;border-radius:50%;cursor:pointer;border:2px solid transparent;display:inline-block;flex-shrink:0;background:#4a9e5a;"></button>
-      <button title="Amarillo" onclick="applyTxtColor('amarillo')" style="width:26px;height:26px;border-radius:50%;cursor:pointer;border:2px solid transparent;display:inline-block;flex-shrink:0;background:#d4a017;"></button>
-      <button title="Morado" onclick="applyTxtColor('morado')" style="width:26px;height:26px;border-radius:50%;cursor:pointer;border:2px solid transparent;display:inline-block;flex-shrink:0;background:#9b59b6;"></button>
-      <button title="Naranja" onclick="applyTxtColor('naranja')" style="width:26px;height:26px;border-radius:50%;cursor:pointer;border:2px solid transparent;display:inline-block;flex-shrink:0;background:#e07820;"></button>
-      <button title="Dorado" onclick="applyTxtColor('dorado')" style="width:26px;height:26px;border-radius:50%;cursor:pointer;border:2px solid transparent;display:inline-block;flex-shrink:0;background:#c9a84c;"></button>
-      <button title="Cyan" onclick="applyTxtColor('cyan')" style="width:26px;height:26px;border-radius:50%;cursor:pointer;border:2px solid transparent;display:inline-block;flex-shrink:0;background:#4a8e9e;"></button>
-      <button title="Negrita" onclick="applyBold()" style="width:26px;height:26px;border-radius:4px;cursor:pointer;border:2px solid var(--border);background:var(--surface2);color:var(--text);font-weight:700;font-size:13px;font-family:serif;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;">B</button>
-    </div>
       <textarea class="form-textarea" id="f-content" placeholder="[Intro]
 [C] [G] [Am] [F]
 
@@ -577,7 +540,7 @@ body.light .theme-toggle-btn{background:var(--surface2);}
 [Coro]
 [C]Cantaré [G]siempre
 [Am]De tu [F]gran amor"></textarea>
-    <div class="form-hint">Formato: [SECCIÓN] · [SECCIÓN:color] para colorear (rojo, azul, verde, amarillo, morado, naranja, dorado, cyan) · [ACORDE] antes de sílaba · Acordes encima de letra · >> al inicio para marcar acordes (ej: >>C D Em G)</div>
+      <div class="form-hint">Formato: [SECCIÓN] para etiquetas · [ACORDE] antes de la sílaba · También acepta acordes encima de la letra (estilo lacuerda.net)</div>
     </div>
     <div class="modal-actions">
       <button class="btn btn-ghost" onclick="closeModalDirect()">Cancelar</button>
@@ -652,7 +615,7 @@ body.light .theme-toggle-btn{background:var(--surface2);}
       <div class="modal-actions">
         <button class="btn btn-ghost" style="width:auto;" onclick="backToImportStep1()">← Volver</button>
         <button class="btn btn-ghost" style="width:auto;" onclick="closeImportModal()">Cancelar</button>
-        <button class="btn btn-primary" style="width:auto;padding:8px 20px;" onclick="saveImported()">✓ Guardar canción</button>
+        <button class="btn btn-primary" style="width:auto;padding:8px 20px;" onclick="saveImported()">✓ Guardar</button>
       </div>
     </div>
   </div>
@@ -963,8 +926,7 @@ function renderEditor() {
   }
 
   parsed.forEach(section => {
-    const _sc = section.color ? " sc-"+section.color : "";
-    html += `<div class="song-section${_sc}"><div class="section-label${_sc}">${escHtml(section.label)}</div>`;
+    html += `<div class="song-section"><div class="section-label">${escHtml(section.label)}</div>`;
     section.lines.forEach(line => {
       if (!line.chordRow && (!line.lyric || line.lyric === '') && !line.chordsOnly) return;
       html += `<div class="lyric-line">`;
@@ -979,28 +941,7 @@ function renderEditor() {
         }
         html += `</div>`;
       }
-      if (line.lyric) {
-        let _raw = line.lyric;
-        let _lh;
-        if (/\{c:[a-z]+\}/.test(_raw)) {
-          // Tiene color — procesar por partes
-          _lh = '';
-          let _rest = _raw;
-          let _cm;
-          const _re = /\{c:([a-z]+)\}(.*?)\{\/c\}/g;
-          let _last = 0;
-          while ((_cm = _re.exec(_raw)) !== null) {
-            _lh += escHtml(_raw.slice(_last, _cm.index));
-            _lh += '<span class="tc-' + _cm[1] + '">' + escHtml(_cm[2]) + '</span>';
-            _last = _cm.index + _cm[0].length;
-          }
-          _lh += escHtml(_raw.slice(_last));
-        } else {
-          _lh = escHtml(_raw);
-        }
-        _lh = _lh.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
-        html += `<div class="lyric-text">${_lh}</div>`;
-      }
+      if (line.lyric) html += `<div class="lyric-text">${escHtml(line.lyric)}</div>`;
       else if (line.chordsOnly) html += `<div class="lyric-text" style="min-height:4px"></div>`;
       html += `</div>`;
     });
@@ -1024,9 +965,7 @@ function parseSong(content, offset, baseKey) {
     const secMatch = trimmed.match(/^\[([^\]]+)\]$/);
     if (secMatch && !isChordToken(secMatch[1])) {
       if (cur) sections.push(cur);
-      const _sr = secMatch[1];
-      const _cm = _sr.match(/^(.+):([a-z]+)$/);
-      cur = { label: _cm ? _cm[1].trim() : _sr, color: _cm ? _cm[2].trim() : null, lines: [] };
+      cur = { label: secMatch[1], lines: [] };
       i++; continue;
     }
     if (!cur) cur = { label: 'Canción', lines: [] };
@@ -1046,11 +985,7 @@ function parseSong(content, offset, baseKey) {
 
 function isChordOnlyLine(line) {
   if (!line || line.trim() === '') return false;
-  const t = line.trim();
-  if (t.startsWith('>>')) return true;
-  const cleaned = t.replace(/[\/\\\-\|\s_~.]+/g, ' ').trim();
-  if (!cleaned) return false;
-  return cleaned.split(/\s+/).every(tk => isChordToken(tk));
+  return line.trim().split(/\s+/).every(t => isChordToken(t));
 }
 
 function isChordToken(str) {
@@ -1073,10 +1008,6 @@ function parseInlineLine(raw, offset) {
 }
 
 function parseStackedLines(chordLine, lyricLine, offset) {
-  let cl = chordLine.trim();
-  if (cl.startsWith('>>')) cl = cl.slice(2).trim();
-  cl = cl.replace(/[\/\\\-\|_~.]+/g, ' ').trim();
-  chordLine = cl;
   const segs = [];
   const re = /\S+/g; let m;
   let width = 0;
@@ -1707,17 +1638,6 @@ const PDF_STYLES = `
     #pdf-toolbar { display:none !important; }
     body { padding-top:0 !important; }
   }
-
-  :root{--tc-rojo:#e05555;--tc-verde:#4a9e5a;--tc-azul:#4a7cce;--tc-amarillo:#d4a017;--tc-morado:#9b59b6;--tc-naranja:#e07820;--tc-dorado:#c9a84c;--tc-cyan:#4a8e9e;}
-
-  .sc-rojo .section-label-pdf{color:#e05555!important;border-bottom-color:#e05555!important;}
-  .sc-verde .section-label-pdf{color:#4a9e5a!important;border-bottom-color:#4a9e5a!important;}
-  .sc-azul .section-label-pdf{color:#4a7cce!important;border-bottom-color:#4a7cce!important;}
-  .sc-amarillo .section-label-pdf{color:#d4a017!important;border-bottom-color:#d4a017!important;}
-  .sc-morado .section-label-pdf{color:#9b59b6!important;border-bottom-color:#9b59b6!important;}
-  .sc-naranja .section-label-pdf{color:#e07820!important;border-bottom-color:#e07820!important;}
-  .sc-dorado .section-label-pdf{color:#c9a84c!important;border-bottom-color:#c9a84c!important;}
-  .sc-cyan .section-label-pdf{color:#4a8e9e!important;border-bottom-color:#4a8e9e!important;}
 `;
 
 const PDF_SCRIPT = `
@@ -1733,7 +1653,6 @@ const PDF_SCRIPT = `
   @media print{#pdf-toolbar{display:none!important;}body{padding-top:0!important;}}
 </style>
 <div id="pdf-toolbar">
-  <button class="tb-btn" onclick="window.close()" style="background:#c9a84c;border-color:#c9a84c;color:#111;font-weight:700;margin-right:8px;">← Volver</button>
   <span class="tb-label">Ajuste</span>
   <button class="tb-btn" onclick="autoFitAll()">&#8635; Auto-ajustar</button>
   <div class="tb-sep"></div>
@@ -1820,13 +1739,7 @@ function buildSongPageHTML(song, offset) {
         }
         out += `<div class="chord-line">${escHtml(chordStr)}</div>`;
       }
-      if (line.lyric) {
-        let _raw2 = line.lyric;
-        let _pl = _raw2.replace(/\{c:([a-z]+)\}(.*?)\{\/c\}/g, function(m,col,txt){ return '<span style="color:var(--tc-'+col+')">'+escHtml(txt)+'</span>'; });
-        if (_pl === _raw2) _pl = escHtml(_raw2);
-        _pl = _pl.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
-        out += `<div class="lyric-line-pdf">${_pl}</div>`;
-      }
+      if (line.lyric) out += `<div class="lyric-line-pdf">${escHtml(line.lyric)}</div>`;
       else if (line.chordsOnly) out += `<div class="lyric-line-pdf">&nbsp;</div>`;
     }
     return out;
@@ -1840,8 +1753,7 @@ function buildSongPageHTML(song, offset) {
   if (song.notes) body += `<div class="song-notes-pdf">📝 ${escHtml(song.notes)}</div>`;
   body += `<div class="sections-wrapper">`;
   parsed.forEach(section => {
-    const _scp=section.color?" sc-"+section.color:"";
-    body += `<div class="section-block${_scp}"><div class="section-label-pdf${_scp}">${escHtml(section.label)}</div><div class="section-content">${renderLines(section.lines)}</div></div>`;
+    body += `<div class="section-block"><div class="section-label-pdf">${escHtml(section.label)}</div><div class="section-content">${renderLines(section.lines)}</div></div>`;
   });
   body += `</div></div>`;
   return body;
@@ -1850,7 +1762,16 @@ function buildSongPageHTML(song, offset) {
 function printSong() {
   if (!currentSongId) { alert('Selecciona una canción primero'); return; }
   const song = songs.find(s => s.id === currentSongId);
-  openPDFWindow(`<!DOCTYPE html><html><head><meta charset="UTF-8"><style>${PDF_STYLES}</style></head><body>${buildSongPageHTML(song, transposeOffset)}${PDF_SCRIPT}</body></html>`, song.title);
+  openPDFWindow(`<!DOCTYPE html><html><head><meta charset="UTF-8"><style>${PDF_STYLES}</style></head><body>${buildSongPageHTML(song, transposeOffset)}${PDF_SCRIPT}<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', function() {
+    navigator.serviceWorker.register('./sw.js')
+      .then(function(reg) { console.log('SW registrado:', reg.scope); })
+      .catch(function(e) { console.log('SW error:', e); });
+  });
+}
+</script>
+</body></html>`, song.title);
 }
 
 function exportSetPDF() {
@@ -1870,7 +1791,16 @@ function exportSetPDF() {
     const song = songs.find(s=>s.id===entry.id); if(!song) return;
     html += buildSongPageHTML(song, entry.offset);
   });
-  html += PDF_SCRIPT + `</body></html>`;
+  html += PDF_SCRIPT + `<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', function() {
+    navigator.serviceWorker.register('./sw.js')
+      .then(function(reg) { console.log('SW registrado:', reg.scope); })
+      .catch(function(e) { console.log('SW error:', e); });
+  });
+}
+</script>
+</body></html>`;
   openPDFWindow(html, setName);
 }
 
@@ -2285,55 +2215,6 @@ function saveData(){
 }
 function isLider(){return _role==='lider';}
 
-function applyBold() {
-  var ta = document.getElementById('f-content');
-  if (!ta) return;
-  var start = ta.selectionStart, end = ta.selectionEnd;
-  var val = ta.value;
-  var selected = val.substring(start, end);
-  if (selected.length > 0) {
-    // Si ya tiene **, quitarlo
-    if (selected.startsWith('**') && selected.endsWith('**')) {
-      var inner = selected.slice(2, -2);
-      ta.value = val.substring(0, start) + inner + val.substring(end);
-      ta.selectionStart = start;
-      ta.selectionEnd = start + inner.length;
-    } else {
-      ta.value = val.substring(0, start) + '**' + selected + '**' + val.substring(end);
-      ta.selectionStart = start;
-      ta.selectionEnd = start + selected.length + 4;
-    }
-  } else {
-    ta.value = val.substring(0, start) + '****' + val.substring(end);
-    ta.selectionStart = start + 2;
-    ta.selectionEnd = start + 2;
-  }
-  ta.focus();
-}
-function applyTxtColor(color) {
-  var ta = document.getElementById('f-content');
-  if (!ta) return;
-  var start = ta.selectionStart, end = ta.selectionEnd;
-  var val = ta.value;
-  var selected = val.substring(start, end);
-  selected = selected.replace(/\{c:[a-z]+\}/g, '').replace(/\{\/c\}/g, '');
-  var newText;
-  if (color && selected.length > 0) {
-    newText = val.substring(0, start) + '{c:' + color + '}' + selected + '{/c}' + val.substring(end);
-    ta.value = newText;
-    ta.selectionStart = start;
-    ta.selectionEnd = start + selected.length + color.length + 7;
-  } else if (color) {
-    newText = val.substring(0, start) + '{c:' + color + '}{/c}' + val.substring(end);
-    ta.value = newText;
-    ta.selectionStart = start + color.length + 4;
-    ta.selectionEnd = start + color.length + 4;
-  } else if (selected.length > 0) {
-    ta.value = val.substring(0, start) + selected + val.substring(end);
-  }
-  ta.focus();
-}
-
 // ─── START ───
 loadTheme();
 init();
@@ -2383,5 +2264,14 @@ setTimeout(updateNashvilleUI, 100);
   </div>
 </div>
 
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', function() {
+    navigator.serviceWorker.register('./sw.js')
+      .then(function(reg) { console.log('SW registrado:', reg.scope); })
+      .catch(function(e) { console.log('SW error:', e); });
+  });
+}
+</script>
 </body>
 </html>
