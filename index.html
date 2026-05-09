@@ -2217,8 +2217,10 @@ function isLider(){return _role==='lider';}
 
 // ─── START ───
 loadTheme();
-init();
-setTimeout(updateNashvilleUI, 100);
+document.addEventListener("DOMContentLoaded", function() {
+  init();
+  setTimeout(updateNashvilleUI, 100);
+});
 </script>
 
 <div class="modal-overlay" id="qrsong-ov" onclick="if(event.target===this)this.classList.remove('open')">
