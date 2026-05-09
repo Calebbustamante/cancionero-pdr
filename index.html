@@ -2214,12 +2214,12 @@ function saveData(){
   }
 }
 function isLider(){return _role==='lider';}
+window.loginSubmit=loginSubmit;
+window.logout=logout;
 
 // ─── START ───
 loadTheme();
 document.addEventListener("DOMContentLoaded", function() {
-  var lb=document.getElementById("login-btn");
-  if(lb) lb.addEventListener("click", loginSubmit);
   init();
   setTimeout(updateNashvilleUI, 100);
 });
@@ -2264,7 +2264,7 @@ document.addEventListener("DOMContentLoaded", function() {
     <input class="login-inp" type="email" id="login-email" placeholder="Correo electrónico">
     <input class="login-inp" type="password" id="login-pass" placeholder="Contraseña">
     <div class="login-err" id="login-err"></div>
-    <button class="login-btn" id="login-btn">Ingresar</button>
+    <button class="login-btn" id="login-btn" onclick="loginSubmit()">Ingresar</button>
   </div>
 </div>
 
