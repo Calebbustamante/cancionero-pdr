@@ -319,7 +319,7 @@ body.light .theme-toggle-btn{background:var(--surface2);}
 .login-box{background:#141417;border:1px solid #2a2a35;border-radius:12px;padding:36px 32px;width:320px;max-width:92vw;text-align:center;}
 .login-inp{width:100%;background:#0d0d0f;border:1px solid #2a2a35;border-radius:6px;color:#e8e4d8;font-size:15px;padding:11px 12px;outline:none;margin-bottom:12px;box-sizing:border-box;}
 .login-err{color:#e05555;font-size:11px;min-height:16px;margin-bottom:10px;}
-.login-btn{width:100%;background:#c9a84c;border:none;color:#0d0d0f;font-size:13px;font-weight:700;padding:13px;border-radius:6px;cursor:pointer;-webkit-tap-highlight-color:rgba(0,0,0,0);touch-action:manipulation;}
+.login-btn{width:100%;background:#c9a84c;border:none;color:#0d0d0f;font-size:13px;font-weight:700;padding:13px;border-radius:6px;cursor:pointer;}
 .lider-only{display:none !important;}
 .is-lider .lider-only{display:inline-flex !important;}
 .is-lider button.lider-only{display:inline-flex !important;}
@@ -2381,7 +2381,7 @@ setTimeout(updateNashvilleUI, 100);
     <input class="login-inp" type="email" id="login-email" placeholder="Correo electrónico">
     <input class="login-inp" type="password" id="login-pass" placeholder="Contraseña">
     <div class="login-err" id="login-err"></div>
-    <button type="button" class="login-btn" id="login-btn" onclick="loginSubmit()">Ingresar</button>
+    <button class="login-btn" id="login-btn" onclick="loginSubmit()">Ingresar</button>
   </div>
 </div>
 
