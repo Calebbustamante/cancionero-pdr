@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+body { background: #0d0d0f; color: white; font-family: monospace; padding: 20px; }
+.ok { color: #4a8; }
+.err { color: #e44; }
+</style>
+</head>
+<body>
+<h2>Diagnóstico</h2>
+<div id="log"></div>
+<script>
+function log(msg, ok) {
+  var d = document.createElement('div');
+  d.className = ok ? 'ok' : 'err';
+  d.textContent = (ok ? '✓ ' : '✗ ') + msg;
+  document.getElementById('log').appendChild(d);
+}
+
+log('JS básico funciona', true);
+log('DOMContentLoaded: ' + document.readyState, true);
+
+// Test Firebase load
+var s = document.createElement('script');
+s.src = 'https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js';
+s.onload = function() { log('Firebase cargó OK', true); testFirebase(); };
+s.onerror = function() { log('Firebase FALLÓ al cargar', false); };
+document.head.appendChild(s);
+
+function testFirebase() {
+  try {
+    firebase.initializeApp({
+      apiKey: "AIzaSyCcpORaxYU6IuIE4vxcC9zqLIR2xtf6Zp8",
+      authDomain: "cancionero-pdr.firebaseapp.com",
+      projectId: "cancionero-pdr"
+    });
+    log('Firebase init OK', true);
+  } catch(e) {
+    log('Firebase init error: ' + e.message, false);
+  }
+}
+</script>
+</body>
+</html>
