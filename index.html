@@ -319,7 +319,7 @@ body.light .theme-toggle-btn{background:var(--surface2);}
 .login-box{background:#141417;border:1px solid #2a2a35;border-radius:12px;padding:36px 32px;width:320px;max-width:92vw;text-align:center;}
 .login-inp{width:100%;background:#0d0d0f;border:1px solid #2a2a35;border-radius:6px;color:#e8e4d8;font-size:15px;padding:11px 12px;outline:none;margin-bottom:12px;box-sizing:border-box;}
 .login-err{color:#e05555;font-size:11px;min-height:16px;margin-bottom:10px;}
-.login-btn{width:100%;background:#c9a84c;border:none;color:#0d0d0f;font-size:13px;font-weight:700;padding:13px;border-radius:6px;cursor:pointer;}
+.login-btn{width:100%;background:#c9a84c;border:none;color:#0d0d0f;font-size:13px;font-weight:700;padding:13px;border-radius:6px;cursor:pointer;-webkit-tap-highlight-color:rgba(0,0,0,0);touch-action:manipulation;}
 .lider-only{display:none !important;}
 .is-lider .lider-only{display:inline-flex !important;}
 .is-lider button.lider-only{display:inline-flex !important;}
@@ -1727,54 +1727,76 @@ const PDF_SCRIPT = `
   .tb-sep{width:1px;height:20px;background:#2a2a35;margin:0 2px;}
   .tb-btn{background:#2a2a35;border:1px solid #3a3a45;color:#e8e4d8;border-radius:4px;padding:4px 9px;font-family:'Courier New',monospace;font-size:10px;cursor:pointer;white-space:nowrap;transition:all .15s;}
   .tb-btn:hover{background:#3a3a45;}
+  .tb-btn.active-page{background:#c9a84c;border-color:#c9a84c;color:#111;font-weight:bold;}
   .tb-btn.print-btn{background:#c9a84c;border-color:#c9a84c;color:#111;font-weight:bold;padding:4px 16px;margin-left:auto;}
   .tb-btn.print-btn:hover{background:#e8c97a;}
   body{padding-top:54px!important;}
   @media print{#pdf-toolbar{display:none!important;}body{padding-top:0!important;}}
+  /* Panel individual por hoja */
+  #page-panel{position:fixed;top:46px;left:0;right:0;background:#111318;border-bottom:1px solid #2a2a35;padding:6px 14px;display:none;align-items:center;gap:8px;font-family:'Courier New',monospace;font-size:11px;flex-wrap:wrap;}
+  #page-panel.open{display:flex;}
+  body.panel-open{padding-top:92px!important;}
+  @media print{#page-panel{display:none!important;}}
+  .pp-title{color:#c9a84c;font-weight:bold;max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .pp-label{color:#7a7567;font-size:9px;text-transform:uppercase;letter-spacing:.1em;}
+  /* Highlight hoja seleccionada */
+  .song-page.selected-page{outline:3px solid #c9a84c;outline-offset:-3px;}
 </style>
 <div id="pdf-toolbar">
   <button class="tb-btn" onclick="window.close()" style="background:#c9a84c;border-color:#c9a84c;color:#111;font-weight:700;margin-right:8px;">← Volver</button>
-  <span class="tb-label">Ajuste</span>
-  <button class="tb-btn" onclick="autoFitAll()">&#8635; Auto-ajustar</button>
-  <div class="tb-sep"></div>
-  <span class="tb-label">Texto</span>
+  <span class="tb-label">Todas</span>
+  <button class="tb-btn" onclick="autoFitAll()">&#8635; Auto</button>
   <button class="tb-btn" onclick="adjAll(-0.5)">A&#8722;</button>
   <button class="tb-btn" onclick="adjAll(+0.5)">A+</button>
   <div class="tb-sep"></div>
+  <span class="tb-label" id="tb-individual-label">Hoja</span>
+  <button class="tb-btn" id="btn-prev-page" onclick="navPage(-1)">&#8592;</button>
+  <span id="tb-page-indicator" style="color:#e8e4d8;min-width:50px;text-align:center;">1 / 1</span>
+  <button class="tb-btn" id="btn-next-page" onclick="navPage(+1)">&#8594;</button>
+  <button class="tb-btn" id="btn-toggle-panel" onclick="togglePagePanel()">&#9998; Ajustar</button>
+  <div class="tb-sep"></div>
   <button class="tb-btn print-btn" onclick="window.print()">Imprimir / PDF</button>
 </div>
-\u003cscript\u003e
-// Cada .song-page tiene height:297mm y padding 12+10mm vertical = 22mm
-// clientHeight de la page = area total disponible en px
-// Comparamos scrollHeight del wrapper con su clientHeight (flex:1 = espacio restante)
+<div id="page-panel">
+  <span class="pp-label">Hoja:</span>
+  <span class="pp-title" id="pp-song-title">—</span>
+  <div class="tb-sep"></div>
+  <span class="pp-label">Texto</span>
+  <button class="tb-btn" onclick="adjPage(-0.5)">A&#8722;</button>
+  <button class="tb-btn" onclick="adjPage(+0.5)">A+</button>
+  <div class="tb-sep"></div>
+  <span class="pp-label">Columnas</span>
+  <button class="tb-btn" id="pp-btn-1col" onclick="setPageCols(1)">1 col</button>
+  <button class="tb-btn" id="pp-btn-2col" onclick="setPageCols(2)">2 col</button>
+  <div class="tb-sep"></div>
+  <button class="tb-btn" onclick="fitPage(getSelPage())">&#8635; Auto</button>
+  <div class="tb-sep"></div>
+  <span class="pp-label" id="pp-size-label">11pt</span>
+</div>
+\\u003cscript\\u003e
+var _selIdx = 0;
+
+function allPages() { return Array.from(document.querySelectorAll('.song-page')); }
+function getSelPage() { return allPages()[_selIdx] || null; }
 
 function fitPage(page) {
+  if (!page) return;
   var wrapper = page.querySelector('.sections-wrapper');
   if (!wrapper) return;
-
-  // Paso 1: reset a 1 columna, fuente 11
   wrapper.classList.remove('two-col');
   page.style.fontSize = '11pt';
-
-  // Forzar reflow
   void page.offsetHeight;
-
-  // Paso 2: reducir fuente 1 col hasta 7.5
   var size = 11;
   while (wrapper.scrollHeight > wrapper.clientHeight && size > 7.5) {
     size = Math.round((size - 0.5) * 10) / 10;
     page.style.fontSize = size + 'pt';
     void page.offsetHeight;
   }
-
-  // Paso 3: si no cabe → 2 columnas, reset fuente a 11
   if (wrapper.scrollHeight > wrapper.clientHeight) {
     wrapper.classList.add('two-col');
     size = 11;
     page.style.fontSize = size + 'pt';
     void page.offsetHeight;
-
-    // Paso 4: reducir fuente 2 col hasta 7
     while (wrapper.scrollHeight > wrapper.clientHeight && size > 7) {
       size = Math.round((size - 0.5) * 10) / 10;
       page.style.fontSize = size + 'pt';
@@ -1783,21 +1805,67 @@ function fitPage(page) {
   }
 }
 
-function autoFitAll() {
-  document.querySelectorAll('.song-page').forEach(function(p) { fitPage(p); });
-}
+function autoFitAll() { allPages().forEach(function(p){ fitPage(p); }); }
 
 function adjAll(d) {
-  document.querySelectorAll('.song-page').forEach(function(page) {
+  allPages().forEach(function(page){
     var cur = parseFloat(page.style.fontSize) || 11;
-    page.style.fontSize = Math.max(6, Math.min(14, cur + d)) + 'pt';
+    page.style.fontSize = Math.max(6, Math.min(16, cur + d)) + 'pt';
   });
+}
+
+function selectPage(idx) {
+  var pages = allPages();
+  if (!pages.length) return;
+  _selIdx = Math.max(0, Math.min(idx, pages.length - 1));
+  pages.forEach(function(p, i){ p.classList.toggle('selected-page', i === _selIdx); });
+  var p = pages[_selIdx];
+  var titleEl = p ? p.querySelector('.song-title-pdf') : null;
+  document.getElementById('pp-song-title').textContent = titleEl ? titleEl.textContent : ('Hoja ' + (_selIdx + 1));
+  document.getElementById('tb-page-indicator').textContent = (_selIdx + 1) + ' / ' + pages.length;
+  updatePanelState(p);
+  if (p) p.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function updatePanelState(page) {
+  if (!page) return;
+  var wrapper = page.querySelector('.sections-wrapper');
+  var is2col = wrapper && wrapper.classList.contains('two-col');
+  document.getElementById('pp-btn-1col').classList.toggle('active-page', !is2col);
+  document.getElementById('pp-btn-2col').classList.toggle('active-page', is2col);
+  var sz = parseFloat(page.style.fontSize) || 11;
+  document.getElementById('pp-size-label').textContent = sz.toFixed(1) + 'pt';
+}
+
+function navPage(d) { selectPage(_selIdx + d); }
+
+function togglePagePanel() {
+  var panel = document.getElementById('page-panel');
+  var open = panel.classList.toggle('open');
+  document.body.classList.toggle('panel-open', open);
+  document.getElementById('btn-toggle-panel').classList.toggle('active-page', open);
+  if (open) selectPage(_selIdx);
+}
+
+function adjPage(d) {
+  var page = getSelPage(); if (!page) return;
+  var cur = parseFloat(page.style.fontSize) || 11;
+  page.style.fontSize = Math.max(6, Math.min(16, cur + d)) + 'pt';
+  updatePanelState(page);
+}
+
+function setPageCols(n) {
+  var page = getSelPage(); if (!page) return;
+  var wrapper = page.querySelector('.sections-wrapper'); if (!wrapper) return;
+  if (n === 2) wrapper.classList.add('two-col'); else wrapper.classList.remove('two-col');
+  updatePanelState(page);
 }
 
 window.addEventListener('load', function() {
   requestAnimationFrame(function() {
     requestAnimationFrame(function() {
       autoFitAll();
+      selectPage(0);
     });
   });
 });
@@ -2381,7 +2449,7 @@ setTimeout(updateNashvilleUI, 100);
     <input class="login-inp" type="email" id="login-email" placeholder="Correo electrónico">
     <input class="login-inp" type="password" id="login-pass" placeholder="Contraseña">
     <div class="login-err" id="login-err"></div>
-    <button class="login-btn" id="login-btn" onclick="loginSubmit()">Ingresar</button>
+    <button type="button" class="login-btn" id="login-btn" onclick="loginSubmit()">Ingresar</button>
   </div>
 </div>
 
