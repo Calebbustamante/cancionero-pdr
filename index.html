@@ -1048,13 +1048,13 @@ function isChordOnlyLine(line) {
   if (!line || line.trim() === '') return false;
   const t = line.trim();
   if (t.startsWith('>>')) return true;
-  const cleaned = t.replace(/[\/\\\-\|\s_~.]+/g, ' ').trim();
+  const cleaned = t.replace(/[\\\-\|\s_~.]+/g, ' ').trim();
   if (!cleaned) return false;
   return cleaned.split(/\s+/).every(tk => isChordToken(tk));
 }
 
 function isChordToken(str) {
-  return /^[A-G][b#]?(m|M|maj|min|dim|aug|sus[24]?|add|dom)?[0-9]*(\/[A-G][b#]?)?$/.test(str.trim());
+  return /^[A-G][b#]?(?:maj|min|m|M|dim|aug|sus)?(?:[0-9]{1,2})?(?:maj|min|m|M|dim|aug|sus[24]?|add[0-9]*|b[0-9]|#[0-9])*(?:\/[A-G][b#]?)?$/.test(str.trim());
 }
 
 function parseInlineLine(raw, offset) {
@@ -1075,7 +1075,7 @@ function parseInlineLine(raw, offset) {
 function parseStackedLines(chordLine, lyricLine, offset) {
   let cl = chordLine.trim();
   if (cl.startsWith('>>')) cl = cl.slice(2).trim();
-  cl = cl.replace(/[\/\\\-\|_~.]+/g, ' ').trim();
+  cl = cl.replace(/[\\\-\|_~.]+/g, ' ').trim();
   chordLine = cl;
   const segs = [];
   const re = /\S+/g; let m;
@@ -1412,7 +1412,7 @@ function backToImportStep1() {
 }
 
 function isChordToken2(t) {
-  return /^[A-G][b#]?(m|M|maj|min|dim|aug|sus[24]?|add[0-9]*|dom)?[0-9]*(\/[A-G][b#]?)?$/.test(t.trim());
+  return /^[A-G][b#]?(?:maj|min|m|M|dim|aug|sus)?(?:[0-9]{1,2})?(?:maj|min|m|M|dim|aug|sus[24]?|add[0-9]*|b[0-9]|#[0-9])*(?:\/[A-G][b#]?)?$/.test(t.trim());
 }
 function looksLikeChordLine2(line) {
   const tokens = line.trim().split(/\s+/);
