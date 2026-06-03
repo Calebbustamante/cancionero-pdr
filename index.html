@@ -148,6 +148,7 @@ body{font-family:'IBM Plex Mono',monospace;background:var(--bg);color:var(--text
 .section-label{font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--text-dim);margin-bottom:10px;padding-bottom:5px;border-bottom:1px solid var(--border);}
 .lyric-line{display:flex;flex-direction:column;margin-bottom:8px;}
 .chord-row-mono{font-family:'IBM Plex Mono',monospace;font-size:13px;font-weight:600;white-space:pre;min-height:18px;margin-bottom:1px;display:block;line-height:1.4;}
+.repeat-mark{color:var(--accent-light);font-size:14px;font-style:normal;margin:0 2px;vertical-align:middle;}
 .chord{color:var(--chord);font-family:'IBM Plex Mono',monospace;font-size:13px;font-weight:600;white-space:pre;transition:color .2s;}
 .chord:hover{color:var(--gold-light);}
 .chord-spacer{color:transparent;white-space:pre;}
@@ -969,7 +970,9 @@ function renderEditor() {
       if (!line.chordRow && (!line.lyric || line.lyric === '') && !line.chordsOnly) return;
       html += `<div class="lyric-line">`;
       if (line.chordRow && line.segments.length) {
-        html += `<div class="chord-row-mono">`;
+        const repeatMark = line.isRepeat ? `<span class="repeat-mark">𝄆</span>` : '';
+        const repeatMarkEnd = line.isRepeat ? `<span class="repeat-mark">𝄇</span>` : '';
+        html += `<div class="chord-row-mono">${repeatMark}`;
         for (const seg of line.segments) {
           if (seg.pad > 0) html += `<span class="chord-spacer">${' '.repeat(seg.pad)}</span>`;
           if (seg.chord) {
@@ -977,7 +980,7 @@ function renderEditor() {
             html += `<span class="chord">${escHtml(display)}</span>`;
           }
         }
-        html += `</div>`;
+        html += `${repeatMarkEnd}</div>`;
       }
       if (line.lyric) {
         let _raw = line.lyric;
@@ -1044,11 +1047,21 @@ function parseSong(content, offset, baseKey) {
   return sections;
 }
 
+function stripRepeatMarkers(str) {
+  // Quita // al inicio y al final (incluyendo variantes como ////, //:, ://), y espacios
+  return str.trim().replace(/^[/:]+/, '').replace(/[/:]+$/, '').trim();
+}
+
 function isChordOnlyLine(line) {
   if (!line || line.trim() === '') return false;
   const t = line.trim();
   if (t.startsWith('>>')) return true;
-  const cleaned = t.replace(/[\\\-\|\s_~.]+/g, ' ').trim();
+  // Detectar líneas con marcadores de repetición // ... //
+  const hasRepeat = /^[/:]/.test(t) || /[/:]$/.test(t);
+  const stripped = hasRepeat ? stripRepeatMarkers(t) : t;
+  if (!stripped) return false;
+  // Separar por espacios, guiones y pipes (pero NO por /, que es parte del bajo)
+  const cleaned = stripped.replace(/[\\\-\|\s_~.]+/g, ' ').trim();
   if (!cleaned) return false;
   return cleaned.split(/\s+/).every(tk => isChordToken(tk));
 }
@@ -1075,7 +1088,12 @@ function parseInlineLine(raw, offset) {
 function parseStackedLines(chordLine, lyricLine, offset) {
   let cl = chordLine.trim();
   if (cl.startsWith('>>')) cl = cl.slice(2).trim();
-  cl = cl.replace(/[\\\-\|_~.]+/g, ' ').trim();
+  // Detectar marcadores de repetición
+  const isRepeat = /^[/:]/.test(cl) || /[/:]$/.test(cl);
+  // Quitar marcadores de repetición // antes de parsear
+  cl = stripRepeatMarkers(cl);
+  // Separar guiones y pipes como separadores (pero no /)
+  cl = cl.replace(/[\\\-\|\s_~.]+/g, ' ').trim();
   chordLine = cl;
   const segs = [];
   const re = /\S+/g; let m;
@@ -1087,7 +1105,7 @@ function parseStackedLines(chordLine, lyricLine, offset) {
       width = m.index + m[0].length;
     }
   }
-  return { chordRow: segs.length > 0, lyric: lyricLine.trim(), segments: segs, chordsOnly: lyricLine.trim() === '' };
+  return { chordRow: segs.length > 0, lyric: lyricLine.trim(), segments: segs, chordsOnly: lyricLine.trim() === '', isRepeat };
 }
 
 // ═══════════════════════════════════════════════════════
