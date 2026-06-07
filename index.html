@@ -1734,19 +1734,29 @@ const PDF_STYLES = `
     flex-direction: column;
   }
 
-  /* ── HOJA DE CONTINUACIÓN (sin encabezado, contenido fluye libremente) ── */
+  /* ── HOJA DE CONTINUACIÓN ── */
   .song-page-cont {
     width: 215.9mm;
-    min-height: 279.4mm;
-    padding: 10mm 15mm 10mm 15mm;
+    min-height: 60mm;
+    max-height: 279.4mm;
+    padding: 14mm 15mm 12mm 15mm;
     page-break-before: always; break-before: page;
     page-break-after: always;  break-after: page;
+    overflow: hidden;
   }
   .song-cont-label {
     font-family:'Courier New',monospace; font-size:7pt; color:#aaa;
-    text-transform:uppercase; letter-spacing:.12em;
-    border-bottom:1px solid #ddd; padding-bottom:3pt; margin-bottom:8pt;
+    text-transform:uppercase; letter-spacing:.15em;
+    border-bottom:1px solid #ddd; padding-bottom:4pt; margin-bottom:10pt;
+    display:flex; align-items:center; gap:8pt;
   }
+  .song-cont-label::before {
+    content:'↳';
+    font-size:9pt;
+    color:#ccc;
+  }
+  .sections-wrapper-cont { }
+  .sections-wrapper-cont .section-block { break-inside:avoid; page-break-inside:avoid; margin-bottom:7pt; }
 
   /* ── ENCABEZADO ── */
   .song-header-pdf { border-bottom:2px solid #111; padding-bottom:4pt; margin-bottom:7pt; flex-shrink:0; }
@@ -1846,22 +1856,19 @@ function wrapperFits(wrapper) {
 }
 
 function splitToSecondPage(page) {
-  // Recuperar el título de la canción para el label de continuación
   var titleEl = page.querySelector('.song-title-pdf');
   var songTitle = titleEl ? titleEl.textContent : '';
-
   var wrapper = page.querySelector('.sections-wrapper');
   if (!wrapper) return;
 
-  // Quitar dos-col y resetear para medir en 1 col
+  // Quitar 2 columnas para medir en 1 col primero
   wrapper.classList.remove('two-col');
+  void page.offsetHeight;
 
-  // Obtener todos los section-blocks
-  var blocks = Array.from(wrapper.querySelectorAll('.section-block'));
-  if (blocks.length < 2) return; // No se puede dividir con solo 1 sección
+  var blocks = Array.from(wrapper.querySelectorAll(':scope > .section-block'));
+  if (blocks.length < 2) return;
 
-  // Ir moviendo secciones del final a una hoja de continuación
-  // hasta que la primera hoja quepa
+  // Mover secciones del final hasta que la primera hoja quepa
   var overflow = [];
   while (!wrapperFits(wrapper) && blocks.length > 1) {
     var last = blocks.pop();
@@ -1870,67 +1877,72 @@ function splitToSecondPage(page) {
     void page.offsetHeight;
   }
 
-  if (!overflow.length) return; // Cabía sin dividir
+  if (!overflow.length) return;
 
-  // Si aún no cabe, intentar 2 columnas en la primera hoja
-  if (!wrapperFits(wrapper)) {
+  // Intentar 2 columnas para recuperar secciones si es posible
+  if (overflow.length > 0) {
     wrapper.classList.add('two-col');
     void page.offsetHeight;
-    // Devolver secciones que no hacían falta quitar
-    while (overflow.length > 1 && wrapperFits(wrapper)) {
-      var toReturn = overflow.shift();
-      wrapper.appendChild(toReturn);
-      blocks.push(toReturn);
+    // Devolver secciones de a una mientras quepan
+    while (overflow.length > 0) {
+      var candidate = overflow[0];
+      wrapper.appendChild(candidate);
       void page.offsetHeight;
-      if (!wrapperFits(wrapper)) {
-        // Fue demasiado, retirar de nuevo
-        wrapper.removeChild(toReturn);
-        blocks.pop();
-        overflow.unshift(toReturn);
+      if (wrapperFits(wrapper)) {
+        overflow.shift(); // quedó, la dejamos
+      } else {
+        wrapper.removeChild(candidate);
         void page.offsetHeight;
         break;
       }
     }
+    if (!wrapperFits(wrapper)) wrapper.classList.remove('two-col');
   }
 
-  // Crear hoja de continuación con las secciones sobrantes
+  if (!overflow.length) return;
+
+  // Crear hoja de continuación
   var contPage = document.createElement('div');
   contPage.className = 'song-page-cont';
-  var label = document.createElement('div');
-  label.className = 'song-cont-label';
-  label.textContent = songTitle + ' — continuación';
-  contPage.appendChild(label);
-  overflow.forEach(function(b) { contPage.appendChild(b); });
-
-  // Insertar la hoja de continuación justo después de la hoja actual
+  contPage.dataset.songTitle = songTitle;
+  var lbl = document.createElement('div');
+  lbl.className = 'song-cont-label';
+  lbl.textContent = songTitle + ' — continuación';
+  contPage.appendChild(lbl);
+  // Crear un wrapper de secciones en la hoja de continuación
+  var contWrapper = document.createElement('div');
+  contWrapper.className = 'sections-wrapper-cont';
+  overflow.forEach(function(b) { contWrapper.appendChild(b); });
+  contPage.appendChild(contWrapper);
   page.parentNode.insertBefore(contPage, page.nextSibling);
 }
 
 function fitPage(page) {
   if (!page) return;
-
-  // Primero limpiar posibles hojas de continuación previas
-  var next = page.nextSibling;
-  while (next && next.classList && next.classList.contains('song-page-cont')) {
-    var toRemove = next;
-    next = next.nextSibling;
-    toRemove.parentNode.removeChild(toRemove);
-  }
-
-  // Restaurar secciones que puedan haber sido movidas a hojas de continuación
-  // (reconstruyendo desde el HTML original no es factible, así que recargamos desde data)
-  // Por ahora solo operamos sobre lo que hay en el wrapper
-
   var wrapper = page.querySelector('.sections-wrapper');
   if (!wrapper) return;
 
-  // Reset
+  // Restaurar secciones que estén en hojas de continuación inmediatamente siguientes
+  var sibling = page.nextSibling;
+  while (sibling && sibling.classList && sibling.classList.contains('song-page-cont')) {
+    var contWrapper = sibling.querySelector('.sections-wrapper-cont');
+    if (contWrapper) {
+      Array.from(contWrapper.querySelectorAll(':scope > .section-block')).forEach(function(b) {
+        wrapper.appendChild(b);
+      });
+    }
+    var toRemove = sibling;
+    sibling = sibling.nextSibling;
+    toRemove.parentNode.removeChild(toRemove);
+  }
+
+  // Reset completo
   wrapper.classList.remove('two-col');
   page.style.overflow = 'hidden';
   page.style.fontSize = '11pt';
   void page.offsetHeight;
 
-  // Paso 1: 1 columna, reducir fuente hasta 8pt
+  // Paso 1: 1 col, reducir fuente hasta 8pt
   var size = 11;
   while (!wrapperFits(wrapper) && size > 8) {
     size = Math.round((size - 0.5) * 10) / 10;
@@ -1938,14 +1950,12 @@ function fitPage(page) {
     void page.offsetHeight;
   }
 
-  // Paso 2: 2 columnas con fuente 11pt
+  // Paso 2: 2 col con fuente 11pt, reducir hasta 8pt
   if (!wrapperFits(wrapper)) {
     wrapper.classList.add('two-col');
     size = 11;
     page.style.fontSize = size + 'pt';
     void page.offsetHeight;
-
-    // Reducir fuente hasta 8pt en 2 columnas
     while (!wrapperFits(wrapper) && size > 8) {
       size = Math.round((size - 0.5) * 10) / 10;
       page.style.fontSize = size + 'pt';
@@ -1953,22 +1963,32 @@ function fitPage(page) {
     }
   }
 
-  // Paso 3: si AÚN no cabe → dividir en segunda hoja
+  // Paso 3: dividir en segunda hoja
   if (!wrapperFits(wrapper)) {
     wrapper.classList.remove('two-col');
     page.style.fontSize = '10pt';
     void page.offsetHeight;
     splitToSecondPage(page);
-    // Actualizar la lista de páginas
-    updatePageCount();
   }
 }
 
 function autoFitAll() {
-  // Primero eliminar todas las hojas de continuación existentes
-  Array.from(document.querySelectorAll('.song-page-cont')).forEach(function(c){ c.parentNode.removeChild(c); });
-  // Luego ajustar cada hoja
-  allPages().forEach(function(p){ fitPage(p); });
+  // Eliminar todas las hojas de continuación existentes y restaurar secciones
+  Array.from(document.querySelectorAll('.song-page-cont')).forEach(function(cont) {
+    var prev = cont.previousSibling;
+    if (prev && prev.classList && prev.classList.contains('song-page')) {
+      var w = prev.querySelector('.sections-wrapper');
+      var cw = cont.querySelector('.sections-wrapper-cont');
+      if (w && cw) {
+        Array.from(cw.querySelectorAll(':scope > .section-block')).forEach(function(b) {
+          w.appendChild(b);
+        });
+      }
+    }
+    cont.parentNode.removeChild(cont);
+  });
+  // Ajustar cada hoja
+  allPages().forEach(function(p) { fitPage(p); });
   updatePageCount();
 }
 
