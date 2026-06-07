@@ -1052,22 +1052,41 @@ function stripRepeatMarkers(str) {
   return str.trim().replace(/^[/:]+/, '').replace(/[/:]+$/, '').trim();
 }
 
+function splitChordTokens(text) {
+  // Separar por espacios, guiones, pipes primero
+  const parts = text.split(/[\s\-\|\s_~.]+/).filter(Boolean);
+  const result = [];
+  for (const part of parts) {
+    if (!part) continue;
+    if (part.includes('/')) {
+      // Verificar si el / es un bajo válido (nota simple después del /)
+      if (isChordToken(part)) {
+        result.push(part); // bajo válido: B/C#, C#m7/B, D/F#
+      } else {
+        // / como separador: B/D#m7 → B, D#m7
+        part.split('/').forEach(p => { if (p) result.push(p); });
+      }
+    } else {
+      result.push(part);
+    }
+  }
+  return result;
+}
+
 function isChordOnlyLine(line) {
   if (!line || line.trim() === '') return false;
   const t = line.trim();
   if (t.startsWith('>>')) return true;
-  // Detectar líneas con marcadores de repetición // ... //
   const hasRepeat = /^[/:]/.test(t) || /[/:]$/.test(t);
   const stripped = hasRepeat ? stripRepeatMarkers(t) : t;
   if (!stripped) return false;
-  // Separar por espacios, guiones y pipes (pero NO por /, que es parte del bajo)
-  const cleaned = stripped.replace(/[\\\-\|\s_~.]+/g, ' ').trim();
-  if (!cleaned) return false;
-  return cleaned.split(/\s+/).every(tk => isChordToken(tk));
+  const tokens = splitChordTokens(stripped);
+  if (!tokens.length) return false;
+  return tokens.every(tk => isChordToken(tk));
 }
 
 function isChordToken(str) {
-  return /^[A-G][b#]?(?:maj|min|m|M|dim|aug|sus)?(?:[0-9]{1,2})?(?:maj|min|m|M|dim|aug|sus[24]?|add[0-9]*|b[0-9]|#[0-9])*(?:\/[A-G][b#]?)?$/.test(str.trim());
+  return /^[A-G][b#]?(?:maj|min|m|M|dim|aug|sus)?(?:[0-9]{1,2})?(?:maj|min|m|M|dim|aug|sus[24]?|add[0-9]*|b[0-9]|#[0-9])*(?:\/[A-G][b#]?(?![a-zA-Z0-9]))?$/.test(str.trim());
 }
 
 function parseInlineLine(raw, offset) {
@@ -1092,21 +1111,31 @@ function parseStackedLines(chordLine, lyricLine, offset) {
   const isRepeat = /^[/:]/.test(cl) || /[/:]$/.test(cl);
   // Quitar marcadores de repetición // antes de parsear
   cl = stripRepeatMarkers(cl);
-  // Separar guiones y pipes como separadores (pero no /)
-  cl = cl.replace(/[\\\-\|\s_~.]+/g, ' ').trim();
-  chordLine = cl;
+  // Usar splitChordTokens para manejar / como bajo o separador inteligentemente
+  const tokens = splitChordTokens(cl);
   const segs = [];
-  const re = /\S+/g; let m;
+  let pos = 0;
   let width = 0;
-  while ((m = re.exec(chordLine)) !== null) {
-    if (isChordToken(m[0])) {
-      const pad = m.index - width;
-      segs.push({ chord: transposeChord(m[0], offset), pad: Math.max(0, pad), pos: m.index });
-      width = m.index + m[0].length;
+  // Reconstruir posiciones usando el texto limpio (sin //)
+  const cleanLine = cl.replace(/[\-\|_~.]+/g, ' ');
+  const re = /\S+/g; let m;
+  while ((m = re.exec(cleanLine)) !== null) {
+    // Obtener el token real (resolviendo / como separador si aplica)
+    const raw = m[0];
+    const subTokens = raw.includes('/') && !isChordToken(raw)
+      ? raw.split('/').filter(Boolean)
+      : [raw];
+    for (const tk of subTokens) {
+      if (isChordToken(tk)) {
+        const pad = m.index - width;
+        segs.push({ chord: transposeChord(tk, offset), pad: Math.max(0, pad), pos: m.index });
+        width = m.index + tk.length;
+      }
     }
   }
   return { chordRow: segs.length > 0, lyric: lyricLine.trim(), segments: segs, chordsOnly: lyricLine.trim() === '', isRepeat };
 }
+
 
 // ═══════════════════════════════════════════════════════
 // TRANSPOSE / NASHVILLE / SCALE
@@ -1430,7 +1459,7 @@ function backToImportStep1() {
 }
 
 function isChordToken2(t) {
-  return /^[A-G][b#]?(?:maj|min|m|M|dim|aug|sus)?(?:[0-9]{1,2})?(?:maj|min|m|M|dim|aug|sus[24]?|add[0-9]*|b[0-9]|#[0-9])*(?:\/[A-G][b#]?)?$/.test(t.trim());
+  return /^[A-G][b#]?(?:maj|min|m|M|dim|aug|sus)?(?:[0-9]{1,2})?(?:maj|min|m|M|dim|aug|sus[24]?|add[0-9]*|b[0-9]|#[0-9])*(?:\/[A-G][b#]?(?![a-zA-Z0-9]))?$/.test(t.trim());
 }
 function looksLikeChordLine2(line) {
   const tokens = line.trim().split(/\s+/);
@@ -1678,7 +1707,7 @@ const PDF_STYLES = `
   * { box-sizing: border-box; margin: 0; padding: 0; }
   html, body { background: #fff; color: #111; width: 215.9mm; }
 
-  /* ── ÍNDICE: hoja propia ── */
+  /* ── ÍNDICE ── */
   .index-page {
     width: 215.9mm; min-height: 279.4mm;
     padding: 14mm 16mm 12mm 16mm;
@@ -1692,7 +1721,7 @@ const PDF_STYLES = `
   .index-key { font-size:8.5pt; color:#333; font-weight:bold; }
   .index-author { font-size:7.5pt; color:#aaa; }
 
-  /* ── CANCIÓN: caja fija exacta A4, nunca se parte ── */
+  /* ── CANCIÓN: hoja fija. Si la canción no cabe, el JS la divide en .song-page-cont ── */
   .song-page {
     width: 215.9mm;
     height: 279.4mm;
@@ -1705,13 +1734,27 @@ const PDF_STYLES = `
     flex-direction: column;
   }
 
+  /* ── HOJA DE CONTINUACIÓN (sin encabezado, contenido fluye libremente) ── */
+  .song-page-cont {
+    width: 215.9mm;
+    min-height: 279.4mm;
+    padding: 10mm 15mm 10mm 15mm;
+    page-break-before: always; break-before: page;
+    page-break-after: always;  break-after: page;
+  }
+  .song-cont-label {
+    font-family:'Courier New',monospace; font-size:7pt; color:#aaa;
+    text-transform:uppercase; letter-spacing:.12em;
+    border-bottom:1px solid #ddd; padding-bottom:3pt; margin-bottom:8pt;
+  }
+
   /* ── ENCABEZADO ── */
   .song-header-pdf { border-bottom:2px solid #111; padding-bottom:4pt; margin-bottom:7pt; flex-shrink:0; }
   .song-title-pdf { font-family:Georgia,serif; font-weight:bold; line-height:1.2; }
   .song-subtitle-pdf { font-family:'Courier New',monospace; color:#555; margin-top:2pt; text-transform:uppercase; letter-spacing:.04em; }
   .song-notes-pdf { font-family:'Courier New',monospace; color:#666; font-style:italic; margin-bottom:5pt; padding:3pt 5pt; background:#f8f8f8; border-left:2px solid #ccc; flex-shrink:0; }
 
-  /* ── CONTENIDO (crece para ocupar el espacio restante) ── */
+  /* ── CONTENIDO ── */
   .sections-wrapper { flex:1; overflow:hidden; }
   .sections-wrapper.two-col { column-count:2; column-gap:12pt; }
   .section-block { break-inside:avoid; page-break-inside:avoid; margin-bottom:7pt; }
@@ -1723,11 +1766,12 @@ const PDF_STYLES = `
   @media print {
     html,body { -webkit-print-color-adjust:exact; print-color-adjust:exact; }
     #pdf-toolbar { display:none !important; }
+    #page-panel { display:none !important; }
     body { padding-top:0 !important; }
+    .song-page.selected-page { outline:none !important; }
   }
 
   :root{--tc-rojo:#e05555;--tc-verde:#4a9e5a;--tc-azul:#4a7cce;--tc-amarillo:#d4a017;--tc-morado:#9b59b6;--tc-naranja:#e07820;--tc-dorado:#c9a84c;--tc-cyan:#4a8e9e;}
-
   .sc-rojo .section-label-pdf{color:#e05555!important;border-bottom-color:#e05555!important;}
   .sc-verde .section-label-pdf{color:#4a9e5a!important;border-bottom-color:#4a9e5a!important;}
   .sc-azul .section-label-pdf{color:#4a7cce!important;border-bottom-color:#4a7cce!important;}
@@ -1797,33 +1841,141 @@ var _selIdx = 0;
 function allPages() { return Array.from(document.querySelectorAll('.song-page')); }
 function getSelPage() { return allPages()[_selIdx] || null; }
 
-function fitPage(page) {
-  if (!page) return;
+function wrapperFits(wrapper) {
+  return wrapper.scrollHeight <= wrapper.clientHeight + 4;
+}
+
+function splitToSecondPage(page) {
+  // Recuperar el título de la canción para el label de continuación
+  var titleEl = page.querySelector('.song-title-pdf');
+  var songTitle = titleEl ? titleEl.textContent : '';
+
   var wrapper = page.querySelector('.sections-wrapper');
   if (!wrapper) return;
+
+  // Quitar dos-col y resetear para medir en 1 col
   wrapper.classList.remove('two-col');
+
+  // Obtener todos los section-blocks
+  var blocks = Array.from(wrapper.querySelectorAll('.section-block'));
+  if (blocks.length < 2) return; // No se puede dividir con solo 1 sección
+
+  // Ir moviendo secciones del final a una hoja de continuación
+  // hasta que la primera hoja quepa
+  var overflow = [];
+  while (!wrapperFits(wrapper) && blocks.length > 1) {
+    var last = blocks.pop();
+    overflow.unshift(last);
+    wrapper.removeChild(last);
+    void page.offsetHeight;
+  }
+
+  if (!overflow.length) return; // Cabía sin dividir
+
+  // Si aún no cabe, intentar 2 columnas en la primera hoja
+  if (!wrapperFits(wrapper)) {
+    wrapper.classList.add('two-col');
+    void page.offsetHeight;
+    // Devolver secciones que no hacían falta quitar
+    while (overflow.length > 1 && wrapperFits(wrapper)) {
+      var toReturn = overflow.shift();
+      wrapper.appendChild(toReturn);
+      blocks.push(toReturn);
+      void page.offsetHeight;
+      if (!wrapperFits(wrapper)) {
+        // Fue demasiado, retirar de nuevo
+        wrapper.removeChild(toReturn);
+        blocks.pop();
+        overflow.unshift(toReturn);
+        void page.offsetHeight;
+        break;
+      }
+    }
+  }
+
+  // Crear hoja de continuación con las secciones sobrantes
+  var contPage = document.createElement('div');
+  contPage.className = 'song-page-cont';
+  var label = document.createElement('div');
+  label.className = 'song-cont-label';
+  label.textContent = songTitle + ' — continuación';
+  contPage.appendChild(label);
+  overflow.forEach(function(b) { contPage.appendChild(b); });
+
+  // Insertar la hoja de continuación justo después de la hoja actual
+  page.parentNode.insertBefore(contPage, page.nextSibling);
+}
+
+function fitPage(page) {
+  if (!page) return;
+
+  // Primero limpiar posibles hojas de continuación previas
+  var next = page.nextSibling;
+  while (next && next.classList && next.classList.contains('song-page-cont')) {
+    var toRemove = next;
+    next = next.nextSibling;
+    toRemove.parentNode.removeChild(toRemove);
+  }
+
+  // Restaurar secciones que puedan haber sido movidas a hojas de continuación
+  // (reconstruyendo desde el HTML original no es factible, así que recargamos desde data)
+  // Por ahora solo operamos sobre lo que hay en el wrapper
+
+  var wrapper = page.querySelector('.sections-wrapper');
+  if (!wrapper) return;
+
+  // Reset
+  wrapper.classList.remove('two-col');
+  page.style.overflow = 'hidden';
   page.style.fontSize = '11pt';
   void page.offsetHeight;
+
+  // Paso 1: 1 columna, reducir fuente hasta 8pt
   var size = 11;
-  while (wrapper.scrollHeight > wrapper.clientHeight && size > 7.5) {
+  while (!wrapperFits(wrapper) && size > 8) {
     size = Math.round((size - 0.5) * 10) / 10;
     page.style.fontSize = size + 'pt';
     void page.offsetHeight;
   }
-  if (wrapper.scrollHeight > wrapper.clientHeight) {
+
+  // Paso 2: 2 columnas con fuente 11pt
+  if (!wrapperFits(wrapper)) {
     wrapper.classList.add('two-col');
     size = 11;
     page.style.fontSize = size + 'pt';
     void page.offsetHeight;
-    while (wrapper.scrollHeight > wrapper.clientHeight && size > 7) {
+
+    // Reducir fuente hasta 8pt en 2 columnas
+    while (!wrapperFits(wrapper) && size > 8) {
       size = Math.round((size - 0.5) * 10) / 10;
       page.style.fontSize = size + 'pt';
       void page.offsetHeight;
     }
   }
+
+  // Paso 3: si AÚN no cabe → dividir en segunda hoja
+  if (!wrapperFits(wrapper)) {
+    wrapper.classList.remove('two-col');
+    page.style.fontSize = '10pt';
+    void page.offsetHeight;
+    splitToSecondPage(page);
+    // Actualizar la lista de páginas
+    updatePageCount();
+  }
 }
 
-function autoFitAll() { allPages().forEach(function(p){ fitPage(p); }); }
+function autoFitAll() {
+  // Primero eliminar todas las hojas de continuación existentes
+  Array.from(document.querySelectorAll('.song-page-cont')).forEach(function(c){ c.parentNode.removeChild(c); });
+  // Luego ajustar cada hoja
+  allPages().forEach(function(p){ fitPage(p); });
+  updatePageCount();
+}
+
+function updatePageCount() {
+  var pages = allPages();
+  document.getElementById('tb-page-indicator').textContent = (_selIdx + 1) + ' / ' + pages.length;
+}
 
 function adjAll(d) {
   allPages().forEach(function(page){
