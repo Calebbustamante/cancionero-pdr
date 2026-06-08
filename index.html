@@ -1905,9 +1905,12 @@ function splitToSecondPage(page) {
   var contPage = document.createElement('div');
   contPage.className = 'song-page-cont';
   contPage.dataset.songTitle = songTitle;
+  // Aplicar estilos inline para garantizar que siempre se apliquen
+  contPage.style.cssText = 'width:215.9mm;min-height:60mm;max-height:279.4mm;padding:14mm 15mm 12mm 15mm;page-break-before:always;break-before:page;page-break-after:always;break-after:page;overflow:hidden;background:#fff;';
   var lbl = document.createElement('div');
   lbl.className = 'song-cont-label';
-  lbl.textContent = songTitle + ' — continuación';
+  lbl.style.cssText = 'font-family:"Courier New",monospace;font-size:7pt;color:#aaa;text-transform:uppercase;letter-spacing:.15em;border-bottom:1px solid #ddd;padding-bottom:4pt;margin-bottom:10pt;';
+  lbl.textContent = '↳ ' + songTitle + ' — continuación';
   contPage.appendChild(lbl);
   // Crear un wrapper de secciones en la hoja de continuación
   var contWrapper = document.createElement('div');
@@ -2108,48 +2111,258 @@ function buildSongPageHTML(song, offset) {
 function printSong() {
   if (!currentSongId) { alert('Selecciona una canción primero'); return; }
   const song = songs.find(s => s.id === currentSongId);
-  openPDFWindow(`<!DOCTYPE html><html><head><meta charset="UTF-8"><style>${PDF_STYLES}</style></head><body>${buildSongPageHTML(song, transposeOffset)}${PDF_SCRIPT}</body></html>`, song.title);
+  const content = buildSongPageHTML(song, transposeOffset);
+  showPDFOverlay(content);
 }
 
 function exportSetPDF() {
   if (!set.length) { alert('El set está vacío'); return; }
   const setName = document.getElementById('set-name').value || 'Set List';
-  let html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><style>${PDF_STYLES}</style></head><body>`;
-  html += `<div class="index-page"><div class="index-title">${escHtml(setName)}</div>
+  let content = `<div class="index-page">
+    <div class="index-title">${escHtml(setName)}</div>
     <div class="index-date">${new Date().toLocaleDateString('es-ES',{weekday:'long',year:'numeric',month:'long',day:'numeric'})}</div>`;
   set.forEach((entry,i) => {
     const s = songs.find(x=>x.id===entry.id); if(!s) return;
     const dk = transposeKey(s.key, entry.offset);
     const offLabel = entry.offset!==0?` (${entry.offset>0?'+':''}${entry.offset})`:'';
-    html += `<div class="index-item"><span class="index-num">${i+1}.</span><span class="index-name">${escHtml(s.title)}</span><span class="index-key">${dk}${offLabel}</span><span class="index-author">${escHtml(s.author||'')}</span></div>`;
+    content += `<div class="index-item"><span class="index-num">${i+1}.</span><span class="index-name">${escHtml(s.title)}</span><span class="index-key">${dk}${offLabel}</span><span class="index-author">${escHtml(s.author||'')}</span></div>`;
   });
-  html += `</div>`;
+  content += `</div>`;
   set.forEach(entry => {
     const song = songs.find(s=>s.id===entry.id); if(!song) return;
-    html += buildSongPageHTML(song, entry.offset);
+    content += buildSongPageHTML(song, entry.offset);
   });
-  html += PDF_SCRIPT + `</body></html>`;
-  openPDFWindow(html, setName);
+  showPDFOverlay(content);
+}
+
+function showPDFOverlay(content) {
+  // Eliminar overlay y toolbar previos
+  document.getElementById('pdf-overlay')?.remove();
+  document.getElementById('pdf-overlay-toolbar')?.remove();
+  document.getElementById('pdf-overlay-styles')?.remove();
+
+  // Estilos
+  const styleEl = document.createElement('style');
+  styleEl.id = 'pdf-overlay-styles';
+  styleEl.textContent = PDF_STYLES + `
+    #pdf-overlay{position:fixed;inset:0;z-index:99999;background:#555;overflow-y:auto;padding-top:54px;}
+    #pdf-overlay-toolbar{position:fixed;top:0;left:0;right:0;height:46px;background:#1a1a1f;color:#e8e4d8;display:flex;align-items:center;gap:8px;padding:0 14px;z-index:100000;font-family:'Courier New',monospace;font-size:11px;box-shadow:0 2px 10px rgba(0,0,0,.5);}
+    .otb-label{color:#7a7567;letter-spacing:.1em;text-transform:uppercase;font-size:9px;white-space:nowrap;}
+    .otb-sep{width:1px;height:20px;background:#2a2a35;margin:0 2px;}
+    .otb-btn{background:#2a2a35;border:1px solid #3a3a45;color:#e8e4d8;border-radius:4px;padding:4px 9px;font-family:'Courier New',monospace;font-size:10px;cursor:pointer;white-space:nowrap;transition:all .15s;}
+    .otb-btn:hover{background:#3a3a45;}
+    .otb-btn.print-btn{background:#c9a84c;border-color:#c9a84c;color:#111;font-weight:bold;padding:4px 16px;margin-left:auto;}
+    .otb-btn.print-btn:hover{background:#e8c97a;}
+    #pdf-overlay .song-page,#pdf-overlay .index-page{margin:16px auto;display:block;box-shadow:0 2px 12px rgba(0,0,0,.4);}
+    #pdf-overlay .song-page-cont{margin:0 auto;display:block;box-shadow:0 2px 12px rgba(0,0,0,.4);}
+    @media print{
+      #pdf-overlay-toolbar{display:none!important;}
+      #pdf-overlay{position:static!important;padding-top:0!important;background:none!important;overflow:visible!important;}
+      #pdf-overlay .song-page,#pdf-overlay .index-page,#pdf-overlay .song-page-cont{margin:0!important;box-shadow:none!important;}
+      body>*:not(#pdf-overlay){display:none!important;}
+    }
+  `;
+  document.head.appendChild(styleEl);
+
+  // Toolbar
+  const toolbar = document.createElement('div');
+  toolbar.id = 'pdf-overlay-toolbar';
+  toolbar.innerHTML = `
+    <button class="otb-btn" style="background:#555;border-color:#777;color:#fff;font-weight:700;" onclick="closePDFOverlay()">✕ Cerrar</button>
+    <div class="otb-sep"></div>
+    <span class="otb-label">Texto</span>
+    <button class="otb-btn" onclick="overlayAdjAll(-0.5)">A−</button>
+    <button class="otb-btn" onclick="overlayAdjAll(+0.5)">A+</button>
+    <div class="otb-sep"></div>
+    <button class="otb-btn" onclick="overlayAutoFit()">⟳ Auto</button>
+    <button class="otb-btn print-btn" onclick="window.print()">🖨 Imprimir / PDF</button>
+  `;
+
+  // Overlay con contenido
+  const overlay = document.createElement('div');
+  overlay.id = 'pdf-overlay';
+  overlay.innerHTML = content;
+
+  document.body.appendChild(overlay);
+  document.body.appendChild(toolbar);
+
+  // Auto-fit tras render
+  requestAnimationFrame(function() {
+    requestAnimationFrame(function() {
+      overlayAutoFit();
+    });
+  });
+}
+
+function overlayAdjAll(d) {
+  document.querySelectorAll('#pdf-overlay .song-page').forEach(function(page) {
+    const cur = parseFloat(page.style.fontSize) || 11;
+    page.style.fontSize = Math.max(6, Math.min(16, cur + d)) + 'pt';
+  });
+}
+
+function overlayAutoFit() {
+  // Limpiar hojas de continuación previas y restaurar secciones
+  document.querySelectorAll('#pdf-overlay .song-page-cont').forEach(function(cont) {
+    const prev = cont.previousElementSibling;
+    if (prev && prev.classList.contains('song-page')) {
+      const w = prev.querySelector('.sections-wrapper');
+      const cw = cont.querySelector('.sections-wrapper-cont');
+      if (w && cw) Array.from(cw.children).forEach(b => w.appendChild(b));
+    }
+    cont.remove();
+  });
+
+  document.querySelectorAll('#pdf-overlay .song-page').forEach(function(page) {
+    const wrapper = page.querySelector('.sections-wrapper');
+    if (!wrapper) return;
+
+    // Para medir correctamente necesitamos quitar overflow:hidden temporalmente
+    // y dar al wrapper altura auto
+    wrapper.classList.remove('two-col');
+    wrapper.style.overflow = 'visible';
+    wrapper.style.height = 'auto';
+    page.style.overflow = 'visible';
+    page.style.fontSize = '11pt';
+    void page.offsetHeight;
+
+    // Altura disponible = altura total de la página menos el encabezado
+    const header = page.querySelector('.song-header-pdf');
+    const notes  = page.querySelector('.song-notes-pdf');
+    const headerH = (header ? header.offsetHeight : 0) + (notes ? notes.offsetHeight : 0);
+    // Padding vertical total = 12mm arriba + 10mm abajo ≈ 83px a 96dpi
+    const paddingV = 12 * 3.7795 + 10 * 3.7795;
+    // Altura total de la hoja en px = 279.4mm
+    const pageH = 279.4 * 3.7795;
+    const availH = pageH - paddingV - headerH - 10; // 10px de margen seguro
+
+    function contentH() { return wrapper.scrollHeight; }
+    function fits()     { return contentH() <= availH; }
+
+    // Paso 1: 1 col, reducir fuente 11→8pt
+    let size = 11;
+    while (!fits() && size > 8) {
+      size = Math.round((size - 0.5) * 10) / 10;
+      page.style.fontSize = size + 'pt';
+      void page.offsetHeight;
+    }
+
+    // Paso 2: 2 col a 11pt, reducir hasta 8pt
+    if (!fits()) {
+      wrapper.classList.add('two-col');
+      size = 11; page.style.fontSize = '11pt';
+      void page.offsetHeight;
+      while (!fits() && size > 8) {
+        size = Math.round((size - 0.5) * 10) / 10;
+        page.style.fontSize = size + 'pt';
+        void page.offsetHeight;
+      }
+    }
+
+    // Restaurar overflow para visualización
+    wrapper.style.overflow = 'hidden';
+    wrapper.style.height   = '';
+    page.style.overflow    = 'hidden';
+
+    // Paso 3: aún no cabe → dividir en segunda hoja
+    if (!fits()) {
+      wrapper.style.overflow = 'visible';
+      wrapper.style.height   = 'auto';
+      page.style.overflow    = 'visible';
+      page.style.fontSize    = '10pt';
+      void page.offsetHeight;
+
+      wrapper.classList.remove('two-col');
+      void page.offsetHeight;
+
+      const titleEl   = page.querySelector('.song-title-pdf');
+      const songTitle = titleEl ? titleEl.textContent : '';
+      const blocks    = Array.from(wrapper.querySelectorAll(':scope > .section-block'));
+      if (blocks.length < 2) {
+        wrapper.style.overflow = 'hidden';
+        wrapper.style.height   = '';
+        page.style.overflow    = 'hidden';
+        return;
+      }
+
+      // Mover secciones del final hasta que quepa
+      const overflow = [];
+      while (!fits() && blocks.length > 1) {
+        const last = blocks.pop();
+        overflow.unshift(last);
+        wrapper.removeChild(last);
+        void page.offsetHeight;
+      }
+
+      // Intentar recuperar con 2 col
+      if (overflow.length > 0) {
+        wrapper.classList.add('two-col');
+        void page.offsetHeight;
+        while (overflow.length > 0) {
+          const c = overflow[0];
+          wrapper.appendChild(c);
+          void page.offsetHeight;
+          if (fits()) { overflow.shift(); }
+          else { wrapper.removeChild(c); void page.offsetHeight; break; }
+        }
+        if (!fits()) wrapper.classList.remove('two-col');
+      }
+
+      // Restaurar overflow
+      wrapper.style.overflow = 'hidden';
+      wrapper.style.height   = '';
+      page.style.overflow    = 'hidden';
+
+      if (!overflow.length) return;
+
+      // Crear hoja de continuación con márgenes correctos
+      const contPage = document.createElement('div');
+      contPage.className = 'song-page-cont';
+      contPage.style.cssText = [
+        'background:#fff',
+        'width:215.9mm',
+        'min-height:100px',
+        'padding:14mm 15mm 12mm 15mm',
+        'page-break-before:always',
+        'break-before:page',
+        'page-break-after:always',
+        'break-after:page',
+        'box-sizing:border-box',
+      ].join(';');
+
+      const lbl = document.createElement('div');
+      lbl.style.cssText = [
+        'font-family:"Courier New",monospace',
+        'font-size:7pt',
+        'color:#aaa',
+        'text-transform:uppercase',
+        'letter-spacing:.15em',
+        'border-bottom:1px solid #ddd',
+        'padding-bottom:4pt',
+        'margin-bottom:10pt',
+      ].join(';');
+      lbl.textContent = '↳ ' + songTitle + ' — continuación';
+
+      const contWrapper = document.createElement('div');
+      contWrapper.className = 'sections-wrapper-cont';
+      contWrapper.style.fontSize = page.style.fontSize;
+      overflow.forEach(b => contWrapper.appendChild(b));
+
+      contPage.appendChild(lbl);
+      contPage.appendChild(contWrapper);
+      page.parentNode.insertBefore(contPage, page.nextSibling);
+    }
+  });
+}
+
+function closePDFOverlay() {
+  document.getElementById('pdf-overlay')?.remove();
+  document.getElementById('pdf-overlay-styles')?.remove();
 }
 
 function openPDFWindow(html, filename) {
-  // Intenta abrir en pestaña nueva (escritorio)
-  try {
-    const w = window.open('', '_blank');
-    if (w && !w.closed) { w.document.write(html); w.document.close(); return; }
-  } catch(e) {}
-  // Fallback blob descargable (móvil / popups bloqueados)
-  try {
-    const blob = new Blob([html], {type:'text/html;charset=utf-8'});
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = (filename||'cancion').replace(/[^\w\s]/g,'').trim() + '.html';
-    document.body.appendChild(a); a.click();
-    setTimeout(()=>{ document.body.removeChild(a); URL.revokeObjectURL(url); }, 1500);
-  } catch(e) {
-    alert('Permite ventanas emergentes en tu navegador para ver el PDF.');
-  }
+  // Ya no se usa — mantenido por compatibilidad
+  showPDFOverlay(html);
 }
 
 // ═══════════════════════════════════════════════════════
