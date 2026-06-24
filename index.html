@@ -521,7 +521,100 @@ body{
 .theme-toggle-btn:hover{border-color:var(--gold-dim);transform:rotate(20deg);}
 body.light .theme-toggle-btn{background:var(--surface2);}
 
-/* ── QR ── */
+/* ── NAV PANEL ── */
+.nav-panel{display:flex;flex-direction:column;flex:1;overflow-y:auto;padding:10px 10px 16px;gap:4px;}
+.nav-panel::-webkit-scrollbar{width:2px;}
+.nav-section-title{font-size:8px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--text-dim);padding:4px 4px 2px;margin-top:2px;}
+
+/* Grid 5 botones (categorías) */
+.nav-btn-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;}
+.nav-btn-grid-2{display:grid;grid-template-columns:1fr 1fr;gap:6px;}
+
+.nav-btn{
+  display:flex;flex-direction:column;align-items:flex-start;
+  padding:10px 12px;border-radius:var(--radius);
+  cursor:pointer;transition:all .18s;
+  gap:4px;position:relative;overflow:hidden;text-align:left;
+  border:1px solid transparent;
+}
+.nav-btn:hover{transform:translateY(-1px);box-shadow:0 4px 16px rgba(0,0,0,.4);}
+.nav-btn-icon{font-size:18px;line-height:1;}
+.nav-btn-label{font-size:11px;font-weight:600;letter-spacing:-.1px;}
+.nav-btn-count{
+  position:absolute;top:7px;right:7px;
+  font-size:9px;font-weight:700;font-family:'JetBrains Mono',monospace;
+  border-radius:10px;padding:1px 5px;min-width:18px;text-align:center;
+}
+
+/* Todos / Canciones — azul-violeta */
+.nav-btn-all{background:linear-gradient(135deg,#3730a3,#1d4ed8);border-color:#4338ca;}
+.nav-btn-all .nav-btn-label{color:#c7d2fe;}
+.nav-btn-all .nav-btn-count{background:#6366f1;color:#fff;}
+.nav-btn-all.active,.nav-btn-all:hover{background:linear-gradient(135deg,#4338ca,#2563eb);border-color:#818cf8;}
+
+/* Adoración — dorado-ámbar */
+.nav-btn-adoracion{background:linear-gradient(135deg,#92400e,#b45309);border-color:#d97706;}
+.nav-btn-adoracion .nav-btn-label{color:#fde68a;}
+.nav-btn-adoracion .nav-btn-count{background:#f59e0b;color:#000;}
+.nav-btn-adoracion.active,.nav-btn-adoracion:hover{background:linear-gradient(135deg,#b45309,#d97706);border-color:#fbbf24;}
+
+/* Alabanza — verde esmeralda */
+.nav-btn-alabanza{background:linear-gradient(135deg,#064e3b,#065f46);border-color:#059669;}
+.nav-btn-alabanza .nav-btn-label{color:#6ee7b7;}
+.nav-btn-alabanza .nav-btn-count{background:#10b981;color:#000;}
+.nav-btn-alabanza.active,.nav-btn-alabanza:hover{background:linear-gradient(135deg,#065f46,#047857);border-color:#34d399;}
+
+/* Transición — violeta-rosa */
+.nav-btn-transicion{background:linear-gradient(135deg,#4c1d95,#6d28d9);border-color:#7c3aed;}
+.nav-btn-transicion .nav-btn-label{color:#ddd6fe;}
+.nav-btn-transicion .nav-btn-count{background:#8b5cf6;color:#fff;}
+.nav-btn-transicion.active,.nav-btn-transicion:hover{background:linear-gradient(135deg,#5b21b6,#7c3aed);border-color:#a78bfa;}
+
+/* Otro — gris */
+.nav-btn-otro{background:linear-gradient(135deg,#1f2937,#374151);border-color:#4b5563;}
+.nav-btn-otro .nav-btn-label{color:#d1d5db;}
+.nav-btn-otro .nav-btn-count{background:#6b7280;color:#fff;}
+.nav-btn-otro.active,.nav-btn-otro:hover{background:linear-gradient(135deg,#374151,#4b5563);border-color:#9ca3af;}
+
+/* Set — cyan-azul */
+.nav-btn-set{background:linear-gradient(135deg,#0c4a6e,#0369a1);border-color:#0284c7;}
+.nav-btn-set .nav-btn-label{color:#bae6fd;}
+.nav-btn-set .nav-btn-count{background:#0ea5e9;color:#000;}
+.nav-btn-set.active,.nav-btn-set:hover{background:linear-gradient(135deg,#0369a1,#0284c7);border-color:#38bdf8;}
+
+/* Historial — rosa */
+.nav-btn-history{background:linear-gradient(135deg,#831843,#9d174d);border-color:#be185d;}
+.nav-btn-history .nav-btn-label{color:#fbcfe8;}
+.nav-btn-history:hover{background:linear-gradient(135deg,#9d174d,#be185d);border-color:#f472b6;}
+
+/* Acciones */
+.nav-actions-grid{display:grid;grid-template-columns:1fr 1fr;gap:5px;}
+.nav-action-btn{
+  display:flex;align-items:center;gap:6px;padding:8px 10px;
+  border-radius:var(--radius-sm);border:1px solid var(--border2);
+  background:var(--surface3);cursor:pointer;transition:all .15s;
+  font-family:'Inter',sans-serif;font-size:10px;font-weight:600;
+  color:var(--text);letter-spacing:.02em;
+}
+.nav-action-btn span{font-size:13px;opacity:.8;}
+.nav-action-btn:hover{background:var(--border);border-color:var(--text-dim);color:#fff;transform:translateY(-1px);}
+
+/* Reloj en nav */
+.nav-clock{margin-top:auto;padding-top:12px;text-align:center;border-top:1px solid var(--border);}
+.nav-clock .clock-display{font-size:22px;}
+
+/* Panel header con botón volver */
+.panel-header{
+  display:flex;align-items:center;gap:8px;padding:8px 12px;
+  border-bottom:1px solid var(--border);flex-shrink:0;
+}
+.panel-back-btn{
+  background:none;border:1px solid var(--border);color:var(--text-dim);
+  padding:3px 8px;border-radius:var(--radius-sm);font-size:10px;font-weight:500;
+  cursor:pointer;transition:all .15s;font-family:'Inter',sans-serif;white-space:nowrap;
+}
+.panel-back-btn:hover{background:var(--surface2);color:var(--text);border-color:var(--border2);}
+.panel-header-title{font-size:12px;font-weight:600;color:var(--text);}
 #qr-container{display:flex;justify-content:center;padding:16px 0;}
 #qr-container canvas,#qr-container img{border-radius:var(--radius);}
 .share-url{
@@ -624,31 +717,81 @@ body.light .theme-toggle-btn{background:var(--surface2);}
   <div class="sidebar-header">
     <div class="logo">Ministerio<br>de Adoración<span>Song Manager</span></div>
   </div>
-  <div class="tabs">
-    <button class="tab active" onclick="showTab('songs')" id="tab-songs">♪ Canciones</button>
-    <button class="tab" onclick="showTab('set')" id="tab-set">≡ Set</button>
-    <button class="tab" onclick="showTab('history')" id="tab-history">⏱ Historial</button>
+  <!-- NAV BUTTONS -->
+  <div class="nav-panel" id="nav-panel">
+    <div class="nav-section-title">Biblioteca</div>
+    <div class="nav-btn-grid">
+      <button class="nav-btn nav-btn-all active" onclick="navGoTo('todos')">
+        <span class="nav-btn-icon">♪</span>
+        <span class="nav-btn-label">Canciones</span>
+        <span class="nav-btn-count" id="nav-cnt-todos">0</span>
+      </button>
+      <button class="nav-btn nav-btn-adoracion" onclick="navGoTo('adoracion')">
+        <span class="nav-btn-icon">✦</span>
+        <span class="nav-btn-label">Adoración</span>
+        <span class="nav-btn-count" id="nav-cnt-adoracion">0</span>
+      </button>
+      <button class="nav-btn nav-btn-alabanza" onclick="navGoTo('alabanza')">
+        <span class="nav-btn-icon">🎵</span>
+        <span class="nav-btn-label">Alabanza</span>
+        <span class="nav-btn-count" id="nav-cnt-alabanza">0</span>
+      </button>
+      <button class="nav-btn nav-btn-transicion" onclick="navGoTo('transicion')">
+        <span class="nav-btn-icon">⇄</span>
+        <span class="nav-btn-label">Transición</span>
+        <span class="nav-btn-count" id="nav-cnt-transicion">0</span>
+      </button>
+      <button class="nav-btn nav-btn-otro" onclick="navGoTo('otro')">
+        <span class="nav-btn-icon">◎</span>
+        <span class="nav-btn-label">Otro</span>
+        <span class="nav-btn-count" id="nav-cnt-otro">0</span>
+      </button>
+    </div>
+    <div class="nav-section-title" style="margin-top:10px;">Servicio</div>
+    <div class="nav-btn-grid nav-btn-grid-2">
+      <button class="nav-btn nav-btn-set" onclick="navGoTo('set')">
+        <span class="nav-btn-icon">≡</span>
+        <span class="nav-btn-label">Set</span>
+        <span class="nav-btn-count" id="nav-cnt-set">0</span>
+      </button>
+      <button class="nav-btn nav-btn-history" onclick="navGoTo('history')">
+        <span class="nav-btn-icon">⏱</span>
+        <span class="nav-btn-label">Historial</span>
+      </button>
+    </div>
+    <div class="nav-section-title" style="margin-top:10px;">Acciones</div>
+    <div class="nav-actions-grid">
+      <button class="nav-action-btn lider-only" onclick="openAddModal()">
+        <span>＋</span> Nueva
+      </button>
+      <button class="nav-action-btn lider-only" onclick="openImportModal()">
+        <span>↑</span> Importar
+      </button>
+      <button class="nav-action-btn" onclick="exportSetPDF()">
+        <span>⊡</span> PDF Set
+      </button>
+      <button class="nav-action-btn" onclick="openPresentation()">
+        <span>⛶</span> Presentar
+      </button>
+      <button class="nav-action-btn" onclick="exportBackup()">
+        <span>⬇</span> Respaldo
+      </button>
+      <button class="nav-action-btn" onclick="openShareModal()">
+        <span>⬡</span> Compartir
+      </button>
+    </div>
+    <!-- Reloj compacto -->
+    <div class="nav-clock">
+      <div class="clock-display" id="clock-time">00:00:00</div>
+      <div class="clock-date" id="clock-date"></div>
+    </div>
   </div>
 
   <!-- SONGS -->
-  <div id="panel-songs" style="display:flex;flex-direction:column;flex:1;overflow:hidden;">
-    <div class="clock-bar">
-      <div style="text-align:center;">
-        <div class="clock-display" id="clock-time">00:00:00</div>
-        <div class="clock-date" id="clock-date"></div>
-      </div>
-    </div>
-    <div class="counters-bar">
-      <div class="counter-total">
-        <span class="counter-total-label">Total canciones</span>
-        <span class="counter-total-val" id="counter-total">0</span>
-      </div>
-      <div class="counters-cats">
-        <div class="cat-counter cat-adoracion"><div class="cat-counter-num" id="cnt-adoracion">0</div><div class="cat-counter-label">Adorac.</div></div>
-        <div class="cat-counter cat-alabanza"><div class="cat-counter-num" id="cnt-alabanza">0</div><div class="cat-counter-label">Alabanza</div></div>
-        <div class="cat-counter cat-transicion"><div class="cat-counter-num" id="cnt-transicion">0</div><div class="cat-counter-label">Transic.</div></div>
-        <div class="cat-counter cat-otro"><div class="cat-counter-num" id="cnt-otro">0</div><div class="cat-counter-label">Otro</div></div>
-      </div>
+  <div id="panel-songs" style="display:none;flex-direction:column;flex:1;overflow:hidden;">
+    <div class="panel-header">
+      <button class="panel-back-btn" onclick="navGoTo('home')">← Inicio</button>
+      <span class="panel-header-title" id="panel-songs-title">Canciones</span>
     </div>
     <div style="display:flex;gap:3px;padding:2px 8px;border-bottom:1px solid var(--border);align-items:center;overflow-x:auto;"><button onclick="setSort('az',this)" style="background:var(--gold);border:1px solid var(--gold);color:var(--bg);font-family:monospace;font-size:9px;padding:1px 6px;border-radius:3px;cursor:pointer;">A-Z</button><button onclick="setSort('tono',this)" style="background:none;border:1px solid var(--border);color:var(--text-dim);font-family:monospace;font-size:9px;padding:1px 6px;border-radius:3px;cursor:pointer;">Tono</button><button onclick="setSort('artista',this)" style="background:none;border:1px solid var(--border);color:var(--text-dim);font-family:monospace;font-size:9px;padding:1px 6px;border-radius:3px;cursor:pointer;">Artista</button><button onclick="setSort('fav',this)" style="background:none;border:1px solid var(--border);color:var(--text-dim);font-family:monospace;font-size:9px;padding:1px 6px;border-radius:3px;cursor:pointer;">★</button></div>
 <input class="search-input" type="text" placeholder="Buscar canción..." oninput="filterSongs(this.value)">
@@ -674,6 +817,10 @@ body.light .theme-toggle-btn{background:var(--surface2);}
 
   <!-- SET -->
   <div id="panel-set" style="display:none;flex-direction:column;flex:1;overflow:hidden;">
+    <div class="panel-header">
+      <button class="panel-back-btn" onclick="navGoTo('home')">← Inicio</button>
+      <span class="panel-header-title">Set</span>
+    </div>
     <input class="set-name-input" type="text" id="set-name" placeholder="Nombre del Set..." value="Set del Domingo">
     <div class="set-panel" id="set-list" style="flex:1;min-height:0;overflow-y:auto;"></div>
     <div class="sidebar-footer" style="flex-shrink:0;">
@@ -691,6 +838,10 @@ body.light .theme-toggle-btn{background:var(--surface2);}
 
   <!-- HISTORY -->
   <div id="panel-history" style="display:none;flex-direction:column;flex:1;overflow:hidden;">
+    <div class="panel-header">
+      <button class="panel-back-btn" onclick="navGoTo('home')">← Inicio</button>
+      <span class="panel-header-title">Historial</span>
+    </div>
     <div class="song-list" id="history-list" style="flex:1;min-height:0;overflow-y:auto;"></div>
     <div class="sidebar-footer" style="flex-shrink:0;">
       <button class="btn btn-ghost" onclick="clearHistory()">✕ Borrar historial</button>
@@ -1053,7 +1204,7 @@ function init() {
   renderSet();
   renderHistory();
   startClock();
-  updateCounters();
+  updateCounters(); updateNavCounts();
   // Load from URL hash (shared set)
   if (location.hash.startsWith('#set=')) {
     try {
@@ -1089,6 +1240,82 @@ function showTab(tab) {
 // SONG LIST
 // ═══════════════════════════════════════════════════════
 function filterSongs(val) { searchFilter = val.toLowerCase(); renderSongList(); }
+
+// ═══════════════════════════════════════════════════════
+// NAV PANEL
+// ═══════════════════════════════════════════════════════
+function navGoTo(dest) {
+  const navPanel   = document.getElementById('nav-panel');
+  const panelSongs = document.getElementById('panel-songs');
+  const panelSet   = document.getElementById('panel-set');
+  const panelHist  = document.getElementById('panel-history');
+
+  // Ocultar todo
+  if (navPanel)   navPanel.style.display   = 'none';
+  if (panelSongs) panelSongs.style.display  = 'none';
+  if (panelSet)   panelSet.style.display    = 'none';
+  if (panelHist)  panelHist.style.display   = 'none';
+
+  // Limpiar activos
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+
+  if (dest === 'home') {
+    if (navPanel) navPanel.style.display = 'flex';
+    updateNavCounts();
+    return;
+  }
+  if (dest === 'set') {
+    if (panelSet) panelSet.style.display = 'flex';
+    document.querySelector('.nav-btn-set')?.classList.add('active');
+    renderSet();
+    return;
+  }
+  if (dest === 'history') {
+    if (panelHist) panelHist.style.display = 'flex';
+    document.querySelector('.nav-btn-history')?.classList.add('active');
+    return;
+  }
+
+  // Categorías de canciones — mostrar panel con filtro
+  if (panelSongs) panelSongs.style.display = 'flex';
+
+  // Aplicar filtro
+  const filterVal = (dest === 'todos') ? 'todos' : dest;
+  catFilter = filterVal;
+  // Actualizar botones de filtro internos del panel
+  ['todos','adoracion','alabanza','transicion','otro'].forEach(c => {
+    const btn = document.getElementById('cf-' + c);
+    if (btn) btn.className = 'cat-filter-btn' + (c === filterVal ? ' active-' + c : '');
+  });
+  renderSongList();
+
+  // Título del panel
+  const titles = {todos:'Canciones',adoracion:'Adoración',alabanza:'Alabanza',transicion:'Transición',otro:'Otro'};
+  const titleEl = document.getElementById('panel-songs-title');
+  if (titleEl) titleEl.textContent = titles[dest] || 'Canciones';
+
+  // Marcar botón nav activo
+  const btnMap = {todos:'.nav-btn-all',adoracion:'.nav-btn-adoracion',alabanza:'.nav-btn-alabanza',transicion:'.nav-btn-transicion',otro:'.nav-btn-otro'};
+  document.querySelector(btnMap[dest])?.classList.add('active');
+}
+
+function updateNavCounts() {
+  const total = songs.length;
+  const counts = {todos:total, adoracion:0, alabanza:0, transicion:0, otro:0};
+  songs.forEach(s => { const c = s.categoria||'otro'; if (counts[c]!==undefined) counts[c]++; });
+  counts.set = set.length;
+  Object.entries(counts).forEach(([k,v]) => {
+    const el = document.getElementById('nav-cnt-' + k);
+    if (el) el.textContent = v;
+  });
+  // También actualizar contadores legacy
+  const t = document.getElementById('counter-total');
+  if (t) t.textContent = total;
+  ['adoracion','alabanza','transicion','otro'].forEach(c => {
+    const el = document.getElementById('cnt-' + c);
+    if (el) el.textContent = songs.filter(s => (s.categoria||'otro') === c).length;
+  });
+}
 
 function setCatFilter(cat) {
   catFilter = cat;
@@ -1692,7 +1919,7 @@ function importBackup(event) {
       renderSongList();
       renderSet();
       renderHistory();
-      updateCounters();
+      updateCounters(); updateNavCounts();
       if (accion) alert(`✓ Respaldo restaurado: ${songs.length} canciones cargadas.`);
     } catch(err) {
       alert('❌ Error al leer el archivo. Asegúrate de que sea un respaldo válido.');
@@ -1834,7 +2061,7 @@ function saveImported() {
   });
   saveData();
   document.getElementById('import-modal').classList.remove('open');
-  renderSongList(); updateCounters();
+  renderSongList(); updateCounters(); updateNavCounts();
   selectSong(songs[songs.length-1].id);
 }
 
@@ -1863,7 +2090,7 @@ function saveSong() {
   } else {
     songs.push({ id: Date.now(), ...data });
   }
-  saveData(); closeModalDirect(); renderSongList(); updateCounters();
+  saveData(); closeModalDirect(); renderSongList(); updateCounters(); updateNavCounts();
   if (editingId) { transposeOffset = 0; renderEditor(); }
 }
 
@@ -1878,7 +2105,7 @@ function deleteSong(id) {
     document.getElementById('toolbar-title').innerHTML = `<span>Ministerio</span> de Adoración`;
     ['transpose-section','pres-btn','edit-btn','nashville-btn','scale-btn'].forEach(bid => document.getElementById(bid).style.display = 'none'); nashvilleMode=false; updateNashvilleUI();
   }
-  saveData(); renderSongList(); renderSet(); updateCounters();
+  saveData(); renderSongList(); renderSet(); updateCounters(); updateNavCounts();
 }
 
 // ═══════════════════════════════════════════════════════
@@ -2791,7 +3018,7 @@ function onLoggedIn(){
   if(em&&_me) em.textContent=_me.email;
   var eb=document.getElementById('edit-btn');
   if(eb) eb.style.display=isL?'':'none';
-  loadData();renderSongList();renderSet();renderHistory();startClock();updateCounters();
+  loadData();renderSongList();renderSet();renderHistory();startClock();updateCounters();updateNavCounts();navGoTo("home"); updateNavCounts();
   startFBSync();
 }
 function loginSubmit(){
@@ -2827,7 +3054,7 @@ function startFBSync(){
     if(!doc.exists)return;
     songs=doc.data().songs||DEFAULT_SONGS;
     songs.forEach(function(s){if(!s.capo)s.capo=0;if(!s.tags)s.tags='';if(s.fav===undefined)s.fav=false;if(!s.categoria)s.categoria='otro';});
-    renderSongList();updateCounters();if(currentSongId)renderEditor();
+    renderSongList();updateCounters(); updateNavCounts();if(currentSongId)renderEditor();
   });
   _uss=_db.collection('data').doc('set').onSnapshot(function(doc){
     if(!doc.exists)return;
