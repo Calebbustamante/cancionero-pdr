@@ -2031,7 +2031,8 @@ const CAT_LABELS = {adoracion:'Adoración',alabanza:'Alabanza',transicion:'Trans
 const CAT_BADGE  = {adoracion:'badge-adoracion',alabanza:'badge-alabanza',transicion:'badge-transicion',otro:'badge-otro'};
 
 function updateCounters() {
-  document.getElementById('counter-total').textContent = songs.length;
+  const total = document.getElementById('counter-total');
+  if (total) total.textContent = songs.length;
   ['adoracion','alabanza','transicion','otro'].forEach(c => {
     const el = document.getElementById('cnt-' + c);
     if (el) el.textContent = songs.filter(s => (s.categoria||'otro') === c).length;
@@ -2341,7 +2342,7 @@ function updateKeyDisplay() {
   if (!song) return;
   const newKey = transposeKey(song.key, transposeOffset);
   const label = newKey + (transposeOffset !== 0 ? ` (${transposeOffset > 0 ? '+' : ''}${transposeOffset})` : '');
-  document.getElementById('key-display').textContent = label;
+  const _kd=document.getElementById('key-display'); if(_kd) _kd.textContent = label;
   const md = document.getElementById('key-display-mobile');
   if (md) md.textContent = label;
 }
