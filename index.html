@@ -1128,7 +1128,7 @@ body.light #login-screen{ background:radial-gradient(90% 60% at 50% 0%, #DCD8FF 
 /* PDF: una línea larga baja de renglón en vez de invadir la otra columna */
 #pdf-overlay .two-col .chord-line, #pdf-overlay .two-col .lyric-line-pdf, #pdf-overlay .sections-wrapper-cont .chord-line{ white-space:pre-wrap; overflow-wrap:anywhere; }
 #pdf-overlay .two-col.ca-medir .chord-line, #pdf-overlay .two-col.ca-medir .lyric-line-pdf{ white-space:pre; overflow-wrap:normal; }
-#pdf-overlay .song-page.ca-larga{ height:auto !important; min-height:279.4mm; overflow:visible !important; page-break-inside:auto !important; break-inside:auto !important; }
+#pdf-overlay .song-page.ca-larga{ height:auto !important; min-height:var(--pg-h,279.4mm); overflow:visible !important; page-break-inside:auto !important; break-inside:auto !important; }
 #pdf-overlay .song-page.ca-larga .section-block{ break-inside:auto; page-break-inside:auto; }
 </style>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
@@ -3299,14 +3299,52 @@ function closePresentation() { document.getElementById('pres-overlay').classList
 // ═══════════════════════════════════════════════════════
 function escHtml(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 
+// ── Tamaños de papel para el PDF (mm) ──
+const PDF_PAPERS = {
+  carta:  { n: 'Carta',  w: 215.9, h: 279.4 },
+  oficio: { n: 'Oficio', w: 215.9, h: 330.2 },
+  a4:     { n: 'A4',     w: 210,   h: 297   },
+  a5:     { n: 'A5',     w: 148,   h: 210   }
+};
+let PDF_PAPER_KEY = 'carta';
+try { const k = localStorage.getItem('ma_pdf_paper'); if (k && PDF_PAPERS[k]) PDF_PAPER_KEY = k; } catch(e) {}
+let PDF_PG = PDF_PAPERS[PDF_PAPER_KEY];
+
+function applyPDFPaper() {
+  const root = document.documentElement;
+  root.style.setProperty('--pg-w', PDF_PG.w + 'mm');
+  root.style.setProperty('--pg-h', PDF_PG.h + 'mm');
+  let st = document.getElementById('pdf-page-size');
+  if (!st) { st = document.createElement('style'); st.id = 'pdf-page-size'; document.head.appendChild(st); }
+  st.textContent = '@page { size: ' + PDF_PG.w + 'mm ' + PDF_PG.h + 'mm; margin: 0; }';
+}
+function clearPDFPaper() {
+  document.documentElement.style.removeProperty('--pg-w');
+  document.documentElement.style.removeProperty('--pg-h');
+  document.getElementById('pdf-page-size')?.remove();
+}
+function pdfPaperOptions() {
+  return Object.keys(PDF_PAPERS).map(k =>
+    '<option value="' + k + '"' + (k === PDF_PAPER_KEY ? ' selected' : '') + '>' +
+    PDF_PAPERS[k].n + ' (' + PDF_PAPERS[k].w + '×' + PDF_PAPERS[k].h + ' mm)</option>').join('');
+}
+function setPDFPaper(key) {
+  if (!PDF_PAPERS[key]) return;
+  PDF_PAPER_KEY = key; PDF_PG = PDF_PAPERS[key];
+  try { localStorage.setItem('ma_pdf_paper', key); } catch(e) {}
+  applyPDFPaper();
+  overlayAutoFit();           // recalcula tamaños y hojas de continuación para el nuevo papel
+  overlaySelectPage(Math.min(_ovPageIdx, overlayAllPages().length - 1));
+}
+
 const PDF_STYLES = `
   @page { size: letter portrait; margin: 0; }
   * { box-sizing: border-box; margin: 0; padding: 0; }
-  html, body { background: #fff; color: #111; width: 215.9mm; }
+  html, body { background: #fff; color: #111; width: var(--pg-w,215.9mm); }
 
   /* ── ÍNDICE ── */
   .index-page {
-    width: 215.9mm; min-height: 279.4mm;
+    width: var(--pg-w,215.9mm); min-height: var(--pg-h,279.4mm);
     padding: 14mm 16mm 12mm 16mm;
     page-break-after: always; break-after: page;
     background: #fff;
@@ -3321,8 +3359,8 @@ const PDF_STYLES = `
 
   /* ── CANCIÓN: hoja fija. Si la canción no cabe, el JS la divide en .song-page-cont ── */
   .song-page {
-    width: 215.9mm;
-    height: 279.4mm;
+    width: var(--pg-w,215.9mm);
+    height: var(--pg-h,279.4mm);
     overflow: hidden;
     padding: 12mm 15mm 10mm 15mm;
     page-break-before: always; break-before: page;
@@ -3334,9 +3372,9 @@ const PDF_STYLES = `
 
   /* ── HOJA DE CONTINUACIÓN ── */
   .song-page-cont {
-    width: 215.9mm;
+    width: var(--pg-w,215.9mm);
     min-height: 60mm;
-    max-height: 279.4mm;
+    max-height: var(--pg-h,279.4mm);
     padding: 14mm 15mm 12mm 15mm;
     page-break-before: always; break-before: page;
     page-break-after: always;  break-after: page;
@@ -3353,7 +3391,8 @@ const PDF_STYLES = `
     font-size:9pt;
     color:#ccc;
   }
-  .sections-wrapper-cont { }
+  .sections-wrapper-cont { display:block; }
+  .sections-wrapper-cont.two-col { column-count:2; column-gap:14pt; column-fill:balance; }
   .sections-wrapper-cont .section-block { break-inside:avoid; page-break-inside:avoid; margin-bottom:7pt; }
 
   /* ── ENCABEZADO ── */
@@ -3495,6 +3534,7 @@ function showPDFOverlay(content) {
     }
   `;
   document.head.appendChild(styleEl);
+  applyPDFPaper();
 
   // Toolbar principal
   const toolbar = document.createElement('div');
@@ -3506,6 +3546,9 @@ function showPDFOverlay(content) {
     <button class="otb-btn" onclick="overlayAdjAll(-0.5)">A−</button>
     <button class="otb-btn" onclick="overlayAdjAll(+0.5)">A+</button>
     <button class="otb-btn" onclick="overlayAutoFit()">⟳ Auto</button>
+    <div class="otb-sep"></div>
+    <span class="otb-label">Papel</span>
+    <select class="otb-btn" id="otb-paper" onchange="setPDFPaper(this.value)">${pdfPaperOptions()}</select>
     <div class="otb-sep"></div>
     <button class="otb-btn" id="otb-pg-btn" onclick="toggleOverlayPanel()">⊞ Por hoja</button>
     <button class="otb-btn print-btn" onclick="window.print()">🖨 Imprimir</button>
@@ -3554,7 +3597,20 @@ function showPDFOverlay(content) {
 let _ovPageIdx = 0;
 
 function overlayAllPages() {
-  return Array.from(document.querySelectorAll('#pdf-overlay .song-page'));
+  // Incluye hojas de continuación (.song-page-cont) para poder editarlas igual que las principales
+  return Array.from(document.querySelectorAll('#pdf-overlay .song-page, #pdf-overlay .song-page-cont'));
+}
+function ovIsCont(page) { return page.classList.contains('song-page-cont'); }
+// Elemento al que se le aplica el tamaño de fuente
+function ovFontEl(page) { return ovIsCont(page) ? (page.querySelector('.sections-wrapper-cont') || page) : page; }
+// Contenedor de secciones (hoja normal o de continuación)
+function ovWrapper(page) { return page.querySelector(ovIsCont(page) ? '.sections-wrapper-cont' : '.sections-wrapper'); }
+function ovPageTitle(page) {
+  if (!ovIsCont(page)) { const t = page.querySelector('.song-title-pdf'); return t ? t.textContent : ''; }
+  let prev = page.previousElementSibling;
+  while (prev && !prev.querySelector('.song-title-pdf')) prev = prev.previousElementSibling;
+  const t = prev ? prev.querySelector('.song-title-pdf') : null;
+  return (t ? t.textContent : 'Hoja') + ' (cont.)';
 }
 
 function overlaySelectPage(idx) {
@@ -3562,24 +3618,18 @@ function overlaySelectPage(idx) {
   if (!pages.length) return;
   _ovPageIdx = Math.max(0, Math.min(idx, pages.length - 1));
   const page = pages[_ovPageIdx];
-  // Indicador
   const ind = document.getElementById('otb-pg-indicator');
   if (ind) ind.textContent = (_ovPageIdx + 1) + '/' + pages.length;
-  // Título
-  const titleEl = page ? page.querySelector('.song-title-pdf') : null;
   const nm = document.getElementById('otb-pg-title');
-  if (nm) nm.textContent = titleEl ? titleEl.textContent : ('Hoja ' + (_ovPageIdx + 1));
-  // Tamaño
+  if (nm) nm.textContent = ovPageTitle(page) || ('Hoja ' + (_ovPageIdx + 1));
   const sz = document.getElementById('otb-pg-size');
-  if (sz) sz.textContent = (parseFloat(page.style.fontSize) || 11).toFixed(1) + 'pt';
-  // Columnas
-  const wrapper = page ? page.querySelector('.sections-wrapper') : null;
+  if (sz) sz.textContent = (parseFloat(ovFontEl(page).style.fontSize) || 11).toFixed(1) + 'pt';
+  const wrapper = ovWrapper(page);
   const is2 = wrapper && wrapper.classList.contains('two-col');
   const b1 = document.getElementById('otb-pg-1col');
   const b2 = document.getElementById('otb-pg-2col');
   if (b1) b1.classList.toggle('active-pg', !is2);
   if (b2) b2.classList.toggle('active-pg', is2);
-  // Scroll a la hoja
   if (page) page.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
@@ -3588,15 +3638,16 @@ function overlayNavPage(d) { overlaySelectPage(_ovPageIdx + d); }
 function overlayAdjPage(d) {
   const pages = overlayAllPages();
   const page = pages[_ovPageIdx]; if (!page) return;
-  const cur = parseFloat(page.style.fontSize) || 11;
-  page.style.fontSize = Math.max(6, Math.min(16, cur + d)) + 'pt';
+  const el = ovFontEl(page);
+  const cur = parseFloat(el.style.fontSize) || 11;
+  el.style.fontSize = Math.max(6, Math.min(16, cur + d)) + 'pt';
   overlaySelectPage(_ovPageIdx);
 }
 
 function overlaySetCols(n) {
   const pages = overlayAllPages();
   const page = pages[_ovPageIdx]; if (!page) return;
-  const wrapper = page.querySelector('.sections-wrapper'); if (!wrapper) return;
+  const wrapper = ovWrapper(page); if (!wrapper) return;
   if (n === 2) wrapper.classList.add('two-col'); else wrapper.classList.remove('two-col');
   overlaySelectPage(_ovPageIdx);
 }
@@ -3604,6 +3655,27 @@ function overlaySetCols(n) {
 function overlayFitPage() {
   const pages = overlayAllPages();
   const page = pages[_ovPageIdx]; if (!page) return;
+  if (ovIsCont(page)) {
+    // Hoja de continuación: ajustar texto/columnas para que quepa en una hoja carta
+    const cw = ovWrapper(page); if (!cw) return;
+    const lbl = page.firstElementChild;
+    const st = window.getComputedStyle(page);
+    const prevMax = page.style.maxHeight, prevOv = page.style.overflow;
+    page.style.maxHeight = 'none'; page.style.overflow = 'visible';
+    const availH = (PDF_PG.h / 25.4 * 96) - parseFloat(st.paddingTop) - parseFloat(st.paddingBottom)
+                 - (lbl ? lbl.getBoundingClientRect().height + 14 : 0) - 8;
+    const fitsC = () => cw.getBoundingClientRect().height <= availH;
+    cw.classList.remove('two-col');
+    let size = 11; cw.style.fontSize = size + 'pt'; void page.offsetHeight;
+    while (!fitsC() && size > 8) { size = Math.round((size - 0.5) * 10) / 10; cw.style.fontSize = size + 'pt'; void page.offsetHeight; }
+    if (!fitsC()) {
+      cw.classList.add('two-col'); size = 11; cw.style.fontSize = '11pt'; void page.offsetHeight;
+      while ((!fitsC() || !caAnchoOk(cw)) && size > 8) { size = Math.round((size - 0.5) * 10) / 10; cw.style.fontSize = size + 'pt'; void page.offsetHeight; }
+    }
+    page.style.maxHeight = prevMax; page.style.overflow = prevOv;
+    overlaySelectPage(_ovPageIdx);
+    return;
+  }
   // Re-correr auto-fit solo en esta hoja
   const wrapper = page.querySelector('.sections-wrapper'); if (!wrapper) return;
   wrapper.classList.remove('two-col');
@@ -3615,7 +3687,7 @@ function overlayFitPage() {
   const notes  = page.querySelector('.song-notes-pdf');
   const headerH = (header ? header.getBoundingClientRect().height : 0) + (notes ? notes.getBoundingClientRect().height : 0);
   const st = window.getComputedStyle(page);
-  const availH = (279.4 / 25.4 * 96) - parseFloat(st.paddingTop) - parseFloat(st.paddingBottom) - headerH - 8;
+  const availH = (PDF_PG.h / 25.4 * 96) - parseFloat(st.paddingTop) - parseFloat(st.paddingBottom) - headerH - 8;
   function fits() { return wrapper.getBoundingClientRect().height <= availH; }
   let size = 11;
   while (!fits() && size > 8) { size = Math.round((size-0.5)*10)/10; page.style.fontSize = size+'pt'; void page.offsetHeight; }
@@ -3634,10 +3706,12 @@ function toggleOverlayPanel() {
 }
 
 function overlayAdjAll(d) {
-  document.querySelectorAll('#pdf-overlay .song-page').forEach(function(page) {
-    const cur = parseFloat(page.style.fontSize) || 11;
-    page.style.fontSize = Math.max(6, Math.min(16, cur + d)) + 'pt';
+  overlayAllPages().forEach(function(page) {
+    const el = ovFontEl(page);
+    const cur = parseFloat(el.style.fontSize) || 11;
+    el.style.fontSize = Math.max(6, Math.min(16, cur + d)) + 'pt';
   });
+  overlaySelectPage(_ovPageIdx);
 }
 
 // Devuelve false si alguna línea no cabe a lo ancho de su columna
@@ -3694,7 +3768,7 @@ function overlayAutoFit() {
     const padTop  = parseFloat(style.paddingTop)    || 0;
     const padBot  = parseFloat(style.paddingBottom) || 0;
     const pageBox = page.getBoundingClientRect();
-    const availH  = (279.4 / 25.4 * 96) - padTop - padBot - headerH - 8;
+    const availH  = (PDF_PG.h / 25.4 * 96) - padTop - padBot - headerH - 8;
 
     function fits() { return wrapper.getBoundingClientRect().height <= availH; }
 
@@ -3784,7 +3858,7 @@ function overlayAutoFit() {
       // Crear hoja de continuación
       const contPage = document.createElement('div');
       contPage.className = 'song-page-cont';
-      contPage.style.cssText = 'background:#fff;width:215.9mm;min-height:100px;padding:14mm 15mm 12mm 15mm;page-break-before:always;break-before:page;page-break-after:always;break-after:page;box-sizing:border-box;display:block;';
+      contPage.style.cssText = 'background:#fff;width:var(--pg-w,215.9mm);min-height:100px;padding:14mm 15mm 12mm 15mm;page-break-before:always;break-before:page;page-break-after:always;break-after:page;box-sizing:border-box;display:block;';
 
       const lbl = document.createElement('div');
       lbl.style.cssText = 'font-family:"Courier New",monospace;font-size:7pt;color:#aaa;text-transform:uppercase;letter-spacing:.15em;border-bottom:1px solid #ddd;padding-bottom:4pt;margin-bottom:10pt;';
@@ -3805,6 +3879,7 @@ function overlayAutoFit() {
 function closePDFOverlay() {
   ['pdf-overlay','pdf-overlay-toolbar','pdf-overlay-panel','pdf-overlay-styles']
     .forEach(id => document.getElementById(id)?.remove());
+  clearPDFPaper();
 }
 
 
